@@ -49,7 +49,7 @@ const PageLayout = ({ children }) => {
                     </ListItem>
                 </List>
             </Drawer>
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: theme => theme.palette.secondary.main }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', backgroundColor: theme => theme.palette.secondary.main, width: '100vw' }}>
                 {/* AppBar/Header */}
                 <AppBar position="static" color="default" sx={{ boxShadow: 'none', borderBottom: '1px solid #e0e0e0', backgroundColor: theme => theme.palette.primary.main }}>
                     <Toolbar>
