@@ -105,7 +105,7 @@ const PageLayout = ({ children }) => {
         </AppBar>
 
         {/* Main Content */}
-        <main style={{ flex: 1 }}>{children}</main>
+        <main style={{ flex: 1, overflow: "hidden" }}>{children}</main>
 
         {/* Footer */}
         <footer

@@ -40,7 +40,7 @@ const palette = {
         paper: '#fff',
     },
     text: {
-        primary: '#212121',
+        primary: '#5A3301',
         secondary: '#757575',
         disabled: '#bdbdbd',
     },
