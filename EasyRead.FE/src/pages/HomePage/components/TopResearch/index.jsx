@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Stack, Typography } from "@mui/material";
-import BookItem from "../BookItem";
+import BookTopItem from "../BookItem/BookTopItem";
 
 const TopResearch = () => {
   return (
@@ -9,9 +9,9 @@ const TopResearch = () => {
         Top Searches:
       </Typography>
       <Stack direction="row" gap={2}>
-        <BookItem />
-        <BookItem />
-        <BookItem />
+        <BookTopItem top={1} />
+        <BookTopItem top={2} />
+        <BookTopItem top={3} />
       </Stack>
     </Box>
   );
