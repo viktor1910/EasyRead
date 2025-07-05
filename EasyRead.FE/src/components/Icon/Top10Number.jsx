@@ -181,7 +181,7 @@ export const Number10 = () => {
       id="rank-10"
       width="100%"
       height="100%"
-      viewBox="0 0 140 154"
+      viewBox="1 0 84 154"
       class="svg-icon svg-icon-rank-10 top-10-rank"
     >
       <path

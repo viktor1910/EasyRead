@@ -1,18 +1,27 @@
 import React from "react";
 import { Box, Stack, Typography } from "@mui/material";
 import BookItem from "../BookItem";
-
+import Carousel from "../../../../components/Carousel";
 const ContinueWatching = () => {
   return (
     <Box>
       <Typography variant="h2" component="p" mb={2}>
         Continue watching:
       </Typography>
-      <Stack direction="row" gap={2}>
-        <BookItem />
-        <BookItem />
-        <BookItem />
-      </Stack>
+      <Carousel
+        items={[
+          <BookItem />,
+          <BookItem />,
+          <BookItem />,
+          <BookItem />,
+          <BookItem />,
+          <BookItem />,
+          <BookItem />,
+          <BookItem />,
+          <BookItem />,
+          <BookItem />,
+        ]}
+      />
     </Box>
   );
 };
