@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router";
 import HomePage from "./pages/HomePage";
 import PageLayout from "./layout/PageLayout";
+import AboutPage from "./pages/About";
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -11,6 +12,14 @@ const AppRouter = () => (
         element={
           <PageLayout>
             <HomePage />
+          </PageLayout>
+        }
+      />
+      <Route
+        path="/about"
+        element={
+          <PageLayout>
+            <AboutPage />
           </PageLayout>
         }
       />
