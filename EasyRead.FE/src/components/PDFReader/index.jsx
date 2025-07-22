@@ -10,6 +10,8 @@ const PDFReader = () => {
   const [pdfDoc, setPdfDoc] = useState(null);
 
   const canvasRef = useRef();
+  const highlightLayerRef = useRef();
+  // Using useRef to store the render task to avoid re-rendering
 
   const renderTask = useRef(null);
   const lastPageRequestedRenderRef = useRef(null);
@@ -49,12 +51,8 @@ const PDFReader = () => {
 
   useEffect(() => {
     if (!pdfDoc) return;
-
-    console.log("PDF document loaded:", pdfDoc);
     const handleDrawPDFPage = (pdfPage) => {
-      console.log("Rendering page:", pdfPage);
       if (!pdfPage) {
-        console.error("PDF page is not available");
         return;
       }
 
@@ -112,8 +110,37 @@ const PDFReader = () => {
   }, [pdfDoc, pageNumber]);
 
   return (
-    <div style={{ textAlign: "center" }}>
-      <canvas ref={canvasRef} style={{ border: "1px solid red" }} />
+    <div
+      style={{
+        textAlign: "center",
+      }}
+    >
+      <div
+        style={{
+          position: "relative",
+          display: "inline-block", // giữ cho highlight theo canvas
+        }}
+      >
+        <canvas
+          ref={canvasRef}
+          style={{
+            display: "block", // tránh inline padding
+          }}
+        />
+        <div
+          ref={highlightLayerRef}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            pointerEvents: "none",
+            zIndex: 2,
+            width: "100%",
+            height: "100%",
+            border: "1px solid blue", // chỉ để debug
+          }}
+        ></div>
+      </div>
       <div style={{ marginTop: 12 }}>
         <button onClick={prevPage}>Previous</button>
         <span style={{ margin: "0 8px" }}>

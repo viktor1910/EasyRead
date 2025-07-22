@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import HomePage from "./pages/HomePage";
 import PageLayout from "./layout/PageLayout";
 import AboutPage from "./pages/About";
+import NotFoundPage from "./pages/404Page";
+import ProtectedRoute from "./context/PermissionContext/ProtectedRoute";
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -23,6 +25,27 @@ const AppRouter = () => (
           </PageLayout>
         }
       />
+      <Route
+        path="/my-account"
+        element={
+          <ProtectedRoute>
+            <PageLayout>
+              <div>my account page</div>
+            </PageLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute>
+            <PageLayout>
+              <div>admin page</div>
+            </PageLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   </BrowserRouter>
 );
