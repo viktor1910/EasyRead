@@ -1,6 +1,5 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
-import usePermission from "../../hooks/usePermission";
+import usePermission from "./usePermission";
 import PropTypes from "prop-types";
 import NoPermission from "../../pages/NoPermission";
 

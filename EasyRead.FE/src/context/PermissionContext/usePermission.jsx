@@ -1,5 +1,5 @@
 import { useContext, useCallback } from "react";
-import { ProfileContext } from "../ProfileContext/ProfileContext";
+// import { ProfileContext } from "../ProfileContext/ProfileContext";
 
 // Example permission structure in profile:
 // profile.permissions = [
@@ -25,7 +25,7 @@ const matchPermission = (profilePerm, checkPerm) => {
 };
 
 const usePermission = () => {
-  const { profile } = useContext(ProfileContext);
+  const { profile } = useContext({});
 
   const checkPermission = useCallback(
     (permissionArray = []) => {
