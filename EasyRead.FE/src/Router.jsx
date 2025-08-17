@@ -4,7 +4,9 @@ import HomePage from "./pages/HomePage";
 import PageLayout from "./layout/PageLayout";
 import AboutPage from "./pages/About";
 import NotFoundPage from "./pages/404Page";
+import CategoriesPage from "./pages/Categories";
 import ProtectedRoute from "./context/PermissionContext/ProtectedRoute";
+import BookDetail from "./pages/Book";
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -43,6 +45,30 @@ const AppRouter = () => (
               <div>admin page</div>
             </PageLayout>
           </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/about-me"
+        element={
+          <PageLayout>
+            <AboutPage />
+          </PageLayout>
+        }
+      />
+      <Route
+        path="/categories/:id"
+        element={
+          <PageLayout>
+            <CategoriesPage />
+          </PageLayout>
+        }
+      />
+      <Route
+        path="/books/:id"
+        element={
+          <PageLayout>
+            <BookDetail />
+          </PageLayout>
         }
       />
       <Route path="*" element={<NotFoundPage />} />

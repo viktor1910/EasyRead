@@ -67,11 +67,10 @@ const PageLayout = ({ children }) => {
         sx={{
           display: "flex",
           flexDirection: "column",
-          backgroundColor: (theme) => theme.palette.secondary.main,
-          width: "100vw",
+          backgroundColor: "#e0d8d7",
+          width: "99vw",
         }}
       >
-        {/* AppBar/Header */}
         <AppBar
           position="static"
           color="default"
