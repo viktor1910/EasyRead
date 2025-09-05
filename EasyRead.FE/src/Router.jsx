@@ -7,6 +7,8 @@ import NotFoundPage from "./pages/404Page";
 import CategoriesPage from "./pages/Categories";
 import ProtectedRoute from "./context/PermissionContext/ProtectedRoute";
 import BookDetail from "./pages/Book";
+import PaymentPage from "./pages/Payment";
+import PaymentSuccessPage from "./pages/PaymentSuccess";
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -69,6 +71,26 @@ const AppRouter = () => (
           <PageLayout>
             <BookDetail />
           </PageLayout>
+        }
+      />
+      <Route
+        path="/payment"
+        element={
+          // <ProtectedRoute module="payment">
+            <PageLayout>
+              <PaymentPage />
+            </PageLayout>
+          // </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/payment/success"
+        element={
+          // <ProtectedRoute module="payment">
+            <PageLayout>
+              <PaymentSuccessPage />
+            </PageLayout>
+          // </ProtectedRoute>
         }
       />
       <Route path="*" element={<NotFoundPage />} />

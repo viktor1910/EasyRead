@@ -16,7 +16,7 @@ const drawerWidth = 240;
 
 const PageLayout = ({ children }) => {
   const [open, setOpen] = useState(false);
-
+ 
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);
 

@@ -1,19 +1,23 @@
-import { useContext, useCallback } from "react";
-// import { ProfileContext } from "../ProfileContext/ProfileContext";
+import { useCallback } from "react";
 
-// Example permission structure in profile:
-// profile.permissions = [
-//   { module: 'user', feature: 'edit', function: 'update' },
-//   { module: 'user', feature: 'view' },
-//   { module: 'admin' }
-// ]
+// Mock permission system - for development purposes
+// In a real app, this would connect to actual authentication/authorization context
 
 /**
- * permissionArray: [
- *   { module: 'user', feature: 'edit', function: 'update' },
- *   { module: 'admin' }
- * ]
+ * Mock user profile with permissions
  */
+const mockProfile = {
+  id: 1,
+  email: "user@example.com",
+  name: "Test User",
+  permissions: [
+    { module: 'user', feature: 'view' },
+    { module: 'user', feature: 'edit' },
+    { module: 'payment', feature: 'access' },
+    { module: 'order', feature: 'create' },
+    { module: 'admin' } // Admin has access to everything
+  ]
+};
 
 const matchPermission = (profilePerm, checkPerm) => {
   if (checkPerm.module && profilePerm.module !== checkPerm.module) return false;
@@ -25,17 +29,20 @@ const matchPermission = (profilePerm, checkPerm) => {
 };
 
 const usePermission = () => {
-  const { profile } = useContext({});
+  // Using mock profile for now - replace with real context when available
+  const profile = mockProfile;
 
   const checkPermission = useCallback(
     (permissionArray = []) => {
-      if (
-        !profile?.permissions ||
-        !Array.isArray(permissionArray) ||
-        permissionArray.length === 0
-      ) {
-        return false;
+      // For development - allow all access if no specific permissions required
+      if (!Array.isArray(permissionArray) || permissionArray.length === 0) {
+        return true;
       }
+
+      if (!profile?.permissions) {
+        return true; // Allow access for development
+      }
+
       return permissionArray.some((checkPerm) =>
         profile.permissions.some((profilePerm) =>
           matchPermission(profilePerm, checkPerm)
@@ -45,7 +52,7 @@ const usePermission = () => {
     [profile]
   );
 
-  return { checkPermission };
+  return { checkPermission, profile };
 };
 
 export default usePermission;
