@@ -16,7 +16,9 @@ const PageLayout = ({ children }) => {
         <Header />
 
         {/* Main Content */}
-        <main style={{ flex: 1, overflow: "hidden" }}>{children}</main>
+        <main style={{ flex: 1, overflow: "hidden", marginTop: "0px" }}>
+          {children}
+        </main>
 
         {/* Footer */}
         <footer

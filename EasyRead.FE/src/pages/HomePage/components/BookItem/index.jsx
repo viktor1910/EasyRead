@@ -1,7 +1,35 @@
 import { Box, Typography } from "@mui/material";
 import React, { useState } from "react";
+import { useNavigate } from "react-router";
 
-const BookItem = () => {
+import PropTypes from "prop-types";
+
+const BookItem = ({ book }) => {
+  console.log("BookItem book", book);
+  const navigate = useNavigate();
+  BookItem.propTypes = {
+    book: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      title: PropTypes.string.isRequired,
+      slug: PropTypes.string,
+      price: PropTypes.number,
+      discount: PropTypes.oneOfType([
+        PropTypes.number,
+        PropTypes.oneOf([null]),
+      ]),
+      stock: PropTypes.number,
+      status: PropTypes.string,
+      description: PropTypes.string,
+      image_url: PropTypes.string,
+      category_id: PropTypes.number,
+      author_id: PropTypes.number,
+      published_year: PropTypes.number,
+      publisher: PropTypes.string,
+      created_at: PropTypes.string,
+      updated_at: PropTypes.string,
+      image_full_url: PropTypes.string,
+    }).isRequired,
+  };
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -21,6 +49,7 @@ const BookItem = () => {
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={() => navigate(`/books/${book.id}`)}
     >
       <Box
         sx={{
@@ -30,8 +59,8 @@ const BookItem = () => {
         mb={1}
       >
         <img
-          src="https://salt.tikicdn.com/cache/750x750/ts/product/e2/9e/ed/e1dbece01b595a871eadb52369e3b20c.jpg.webp"
-          alt="Book Cover"
+          src={book.image_full_url || book.image_url}
+          alt={book.title}
           style={{
             width: "100%",
             height: "100%",
@@ -63,10 +92,10 @@ const BookItem = () => {
         )}
       </Box>
       <Typography variant="h6" fontWeight={700} pl={1} mb={0.5}>
-        Book Title
+        {book.title}
       </Typography>
       <Typography variant="body2" pl={1}>
-        Author Name
+        {book.publisher}
       </Typography>
     </Box>
   );

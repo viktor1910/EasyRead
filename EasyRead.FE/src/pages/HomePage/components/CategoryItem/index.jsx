@@ -1,7 +1,8 @@
-import React from "react";
 import { Box, Typography } from "@mui/material";
-
-const CategoryItem = ({ category, onClick }) => {
+import { useNavigate } from "react-router";
+// ...existing code...
+const CategoryItem = ({ category }) => {
+  const navigate = useNavigate();
   return (
     <Box
       sx={{
@@ -10,6 +11,7 @@ const CategoryItem = ({ category, onClick }) => {
         flexDirection: "column",
         cursor: "pointer",
       }}
+      onClick={() => navigate(`/categories/${category?.id}`)}
     >
       <Box
         sx={{
@@ -36,7 +38,7 @@ const CategoryItem = ({ category, onClick }) => {
             textShadow: "-4px 1px 6px rgba(0,0,0,0.58)",
           }}
         >
-          Biographies
+          {category?.name}
         </Typography>
         <Typography
           variant="body2"
