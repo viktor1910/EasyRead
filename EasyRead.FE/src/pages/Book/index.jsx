@@ -36,7 +36,14 @@ const BookDetail = () => {
   };
 
   return (
-    <Box display="flex" gap={4} p="32px 16px" bgcolor="#fff" minHeight="100vh">
+    <Box
+      display="flex"
+      justifyContent="center"
+      gap={4}
+      p="32px 16px"
+      bgcolor="#fff"
+      minHeight="100vh"
+    >
       {/* Left: Images */}
       <Box
         flex="0 0 340px"

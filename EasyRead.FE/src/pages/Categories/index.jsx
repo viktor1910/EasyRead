@@ -3,7 +3,6 @@ import Typography from "@mui/material/Typography";
 import { Box, Divider, List, ListItem, Stack } from "@mui/material";
 import { useParams } from "react-router";
 import Categories from "../HomePage/components/Categories";
-import AllProduct from "../HomePage/components/AllProduct";
 import BookItem from "../HomePage/components/BookItem";
 
 const CategoriesPage = () => {

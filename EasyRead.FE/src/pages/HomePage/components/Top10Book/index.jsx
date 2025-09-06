@@ -7,7 +7,7 @@ const Top10Book = () => {
   return (
     <Box>
       <Typography variant="h2" component="p" mb={2}>
-        Top 10 book today:
+        Top 10 sách bán chạy nhất:
       </Typography>
 
       <Carousel

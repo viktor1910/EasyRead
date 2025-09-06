@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Của hàng sách Nhóm 10</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <style>
+        /* Reset CSS cơ bản và thiết lập font chữ mặc định */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Cài đặt cho toàn trang */
+        body {
+            padding-top: 300px; /* Đẩy nội dung xuống dưới để tránh bị header cố định che */
+            background: #f8f8f8;
+            color: #333;
+        }
+
+        /* Header cố định trên cùng màn hình */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 800;
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* Thanh trên cùng: chứa logo, thanh tìm kiếm và tài khoản */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 40px; /* Chiều cao được thu gọn */
+        }
+
+        /* Logo cửa hàng */
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* Thanh tìm kiếm */
+        .search-bar {
+            flex: 1;
+            margin: 0 20px;
+            display: flex;
+        }
+
+        /* Ô nhập tìm kiếm */
+        .search-bar input {
+            flex: 1;
+            padding: 8px;
+        }
+
+        /* Nút tìm kiếm */
+        .search-bar button {
+            padding: 8px 10px;
+            background: red;
+            color: #fff;
+            border: none;
+        }
+
+        /* Tài khoản người dùng và icon yêu thích, giỏ hàng */
+        .user-actions a, .user-actions i {
+            margin-left: 15px;
+            color: #555;
+            text-decoration: none;
+        }
+
+        /* Menu chính bên dưới thanh top-bar */
+        .main-nav {
+            background: #f1f1f1;
+            padding: 10px 30px;
+        }
+
+        .main-nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        .main-nav a {
+            text-decoration: none;
+            color: #000;
+            font-weight: 500;
+        }
+
+        /* Khu vực bài viết/gợi ý sách */
+        .articles {
+            display: flex;
+            gap: 20px;
+            padding: 0px 30px;
+        }
+
+        .article {
+            background: #fff;
+            padding: 15px;
+            flex: 1;
+            border: 1px solid #ddd;
+        }
+
+        .article img {
+            max-width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .article h3 {
+            margin: 10px 0;
+        }
+
+        .article a {
+            display: inline-block;
+            margin-top: 10px;
+            color: red;
+            text-decoration: none;
+        }
+
+        /* Các tiện ích (free shipping, bảo mật...) */
+        .features {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background: #fff;
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .features div {
+            text-align: center;
+        }
+
+        .features i {
+            font-size: 24px;
+            margin-bottom: 5px;
+            color: red;
+        }
+
+        /* Phần chân trang */
+        footer {
+            background: #222;
+            color: #ccc;
+            padding: 30px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .footer-content h4 {
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .footer-content input, .footer-content button {
+            padding: 6px;
+            margin-top: 5px;
+        }
+
+        .footer-content ul {
+            list-style: none;
+        }
+
+        .footer-content ul li a {
+            color: #ccc;
+            text-decoration: none;
+        }
+
+        .bottom-bar {
+            text-align: center;
+            padding-top: 15px;
+            border-top: 1px solid #444;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+  <header>
+    <div class="top-bar">
+      <div class="logo">{logo}</div>
+      <div class="search-bar">
+        <input type="text" placeholder="Tìm sách..." />
+        <button><i class="fas fa-search"></i></button>
+      </div>
+      <div class="user-actions">
+        <a href="#">Đăng nhập</a> | <a href="#">Đăng ký</a>
+        <i class="fas fa-heart"></i>
+        <i class="fas fa-shopping-cart"></i>
+      </div>
+    </div>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="#">Trang chủ</a></li>
+        <li><a href="#">Thiếu nhi</a></li>
+        <li><a href="#">Trinh thám</a></li>
+        <li><a href="#">Kiếm hiệp</a></li>
+        <li><a href="#">Ngôn tình</a></li>
+        <li><a href="#">Bán chạy</a></li>
+        <li><a href="#">Mới về</a></li>
+        <li><a href="#">Giảm giá</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- <section class="articles">
+    <div class="article">
+      <img src="book1.jpg" alt="Book 1" />
+      <h3>Sustainable Living Through Books</h3>
+      <p>Explore how reading can change your life and support sustainability...</p>
+      <a href="#">Xem thêm...</a>
+    </div>
+    <div class="article">
+      <img src="book2.jpg" alt="Book 2" />
+      <h3>The Future of Education Through Books</h3>
+      <p>Books that inspire and guide the modern learner...</p>
+      <a href="#">Xem thêm...</a>
+    </div>
+    <div class="article">
+      <img src="book3.jpg" alt="Book 3" />
+      <h3>Top Books for Self-Development</h3>
+      <p>Build your skills and confidence with the right reads...</p>
+      <a href="#">Xem thêm...</a>
+    </div>
+  </section>
+
+  <section class="features">
+    <div><i class="fas fa-truck"></i><p>Free Shipping on Orders Over $50</p></div>
+    <div><i class="fas fa-sync-alt"></i><p>30 Days Return Policy</p></div>
+    <div><i class="fas fa-lock"></i><p>Secure Payment</p></div>
+    <div><i class="fas fa-gift"></i><p>Special Gifts with First Order</p></div>
+    <div><i class="fas fa-headset"></i><p>24/7 Support</p></div>
+  </section> -->
+
+  <!-- <footer>
+    <div class="footer-content">
+      <div class="contact">
+        <h4>Liên hệ</h4>
+        <p>Cửa hàng sách NHOM10</p>
+        <p>999 Hàn Thuyên, Phường Linh Trung, Tp.HCM , Việt Nam</p>
+        <p>Email: team10@email.com</p>
+        <p>Điện thoại: (+84) 777-888-999</p>
+      </div>
+      <div class="links">
+        <h4>Sản phẩm</h4>
+        <ul>
+          <li><a href="#">Hạ giá</a></li>
+          <li><a href="#">Sản phẩm mới</a></li>
+          <li><a href="#">Cháy hàng</a></li>
+          <li><a href="#">Cửa hàng</a></li>
+        </ul>
+      </div>
+      <div class="company">
+        <h4>Our Company</h4>
+        <ul>
+          <li><a href="#">Delivery</a></li>
+          <li><a href="#">Legal Notice</a></li>
+          <li><a href="#">Terms and Conditions</a></li>
+        </ul>
+      </div>
+      <div class="newsletter">
+        <h4>Subscribe</h4>
+        <input type="email" placeholder="Nhập email của bạn" />
+        <button>Subscribe</button>
+        <label><input type="checkbox" /> I agree to terms & policy</label>
+      </div>
+    </div>
+    <div class="bottom-bar">
+      <p>&copy; Được thiết kế bởi Nhóm 10</p>
+    </div>
+  </footer> -->
+</body>
+</html>

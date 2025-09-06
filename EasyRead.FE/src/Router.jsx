@@ -7,6 +7,7 @@ import NotFoundPage from "./pages/404Page";
 import CategoriesPage from "./pages/Categories";
 import ProtectedRoute from "./context/PermissionContext/ProtectedRoute";
 import BookDetail from "./pages/Book";
+import AdminPage from "./pages/Admin";
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -37,16 +38,7 @@ const AppRouter = () => (
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute>
-            <PageLayout>
-              <div>admin page</div>
-            </PageLayout>
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/admin/*" element={<AdminPage />} />
       <Route
         path="/about-me"
         element={
