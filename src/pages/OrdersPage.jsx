@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -21,7 +21,7 @@ import {
   DialogActions,
   TextField,
   MenuItem,
-} from '@mui/material';
+} from "@mui/material";
 import {
   ExpandMore as ExpandMoreIcon,
   ShoppingBag as ShoppingBagIcon,
@@ -30,9 +30,9 @@ import {
   Cancel as CancelIcon,
   AccessTime as AccessTimeIcon,
   Receipt as ReceiptIcon,
-} from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
-import axios from '../AxiosConfig';
+} from "@mui/icons-material";
+import { useNavigate } from "react-router";
+import axios from "../AxiosConfig";
 
 const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
@@ -48,11 +48,11 @@ const OrdersPage = () => {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/orders/');
+      const response = await axios.get("/orders/");
       setOrders(response.data);
     } catch (err) {
-      setError('Không thể tải danh sách đơn hàng');
-      console.error('Error fetching orders:', err);
+      setError("Không thể tải danh sách đơn hàng");
+      console.error("Error fetching orders:", err);
     } finally {
       setLoading(false);
     }
@@ -63,64 +63,87 @@ const OrdersPage = () => {
       const response = await axios.get(`/orders/${orderId}`);
       setSelectedOrder(response.data);
     } catch (err) {
-      setError('Không thể tải chi tiết đơn hàng');
-      console.error('Error fetching order detail:', err);
+      setError("Không thể tải chi tiết đơn hàng");
+      console.error("Error fetching order detail:", err);
     }
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'pending': return 'warning';
-      case 'paid': return 'info';
-      case 'shipped': return 'primary';
-      case 'completed': return 'success';
-      case 'cancelled': return 'error';
-      default: return 'default';
+      case "pending":
+        return "warning";
+      case "paid":
+        return "info";
+      case "shipped":
+        return "primary";
+      case "completed":
+        return "success";
+      case "cancelled":
+        return "error";
+      default:
+        return "default";
     }
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'pending': return <AccessTimeIcon />;
-      case 'paid': return <ReceiptIcon />;
-      case 'shipped': return <LocalShippingIcon />;
-      case 'completed': return <CheckCircleIcon />;
-      case 'cancelled': return <CancelIcon />;
-      default: return <ShoppingBagIcon />;
+      case "pending":
+        return <AccessTimeIcon />;
+      case "paid":
+        return <ReceiptIcon />;
+      case "shipped":
+        return <LocalShippingIcon />;
+      case "completed":
+        return <CheckCircleIcon />;
+      case "cancelled":
+        return <CancelIcon />;
+      default:
+        return <ShoppingBagIcon />;
     }
   };
 
   const getStatusText = (status) => {
     switch (status) {
-      case 'pending': return 'Chờ xử lý';
-      case 'paid': return 'Đã thanh toán';
-      case 'shipped': return 'Đang giao hàng';
-      case 'completed': return 'Hoàn thành';
-      case 'cancelled': return 'Đã hủy';
-      default: return status;
+      case "pending":
+        return "Chờ xử lý";
+      case "paid":
+        return "Đã thanh toán";
+      case "shipped":
+        return "Đang giao hàng";
+      case "completed":
+        return "Hoàn thành";
+      case "cancelled":
+        return "Đã hủy";
+      default:
+        return status;
     }
   };
 
   const formatPrice = (price) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
     }).format(price);
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('vi-VN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleDateString("vi-VN", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="400px"
+      >
         <CircularProgress />
       </Box>
     );
@@ -137,8 +160,8 @@ const OrdersPage = () => {
   if (orders.length === 0) {
     return (
       <Container maxWidth="md" sx={{ mt: 4 }}>
-        <Paper sx={{ p: 4, textAlign: 'center' }}>
-          <ShoppingBagIcon sx={{ fontSize: 80, color: 'grey.400', mb: 2 }} />
+        <Paper sx={{ p: 4, textAlign: "center" }}>
+          <ShoppingBagIcon sx={{ fontSize: 80, color: "grey.400", mb: 2 }} />
           <Typography variant="h5" gutterBottom>
             Chưa có đơn hàng nào
           </Typography>
@@ -148,7 +171,7 @@ const OrdersPage = () => {
           <Button
             variant="contained"
             size="large"
-            onClick={() => navigate('/books')}
+            onClick={() => navigate("/books")}
             startIcon={<ShoppingBagIcon />}
           >
             Mua sắm ngay
@@ -160,7 +183,11 @@ const OrdersPage = () => {
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
+      <Typography
+        variant="h4"
+        gutterBottom
+        sx={{ display: "flex", alignItems: "center", gap: 1, mb: 3 }}
+      >
         <ShoppingBagIcon />
         Đơn hàng của tôi
       </Typography>
@@ -172,26 +199,44 @@ const OrdersPage = () => {
       <Grid container spacing={4}>
         {orders.map((order) => (
           <Grid item xs={12} sm={6} md={4} key={order.id}>
-            <Card 
-              sx={{ 
-                height: '100%',
-                minHeight: '280px',
-                cursor: 'pointer',
-                border: selectedOrder?.id === order.id ? '2px solid' : '1px solid',
-                borderColor: selectedOrder?.id === order.id ? 'primary.main' : 'divider',
-                backgroundColor: selectedOrder?.id === order.id ? 'primary.50' : 'background.paper',
-                '&:hover': {
+            <Card
+              sx={{
+                height: "100%",
+                minHeight: "280px",
+                cursor: "pointer",
+                border:
+                  selectedOrder?.id === order.id ? "2px solid" : "1px solid",
+                borderColor:
+                  selectedOrder?.id === order.id ? "primary.main" : "divider",
+                backgroundColor:
+                  selectedOrder?.id === order.id
+                    ? "primary.50"
+                    : "background.paper",
+                "&:hover": {
                   boxShadow: 4,
-                  transform: 'translateY(-3px)',
-                  transition: 'all 0.3s ease-in-out',
-                  backgroundColor: selectedOrder?.id === order.id ? 'primary.50' : 'grey.50',
-                }
+                  transform: "translateY(-3px)",
+                  transition: "all 0.3s ease-in-out",
+                  backgroundColor:
+                    selectedOrder?.id === order.id ? "primary.50" : "grey.50",
+                },
               }}
               onClick={() => handleViewDetail(order.id)}
             >
-              <CardContent sx={{ p: 4, height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <CardContent
+                sx={{
+                  p: 4,
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
                 {/* Header */}
-                <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={3}>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="flex-start"
+                  mb={3}
+                >
                   <Typography variant="h5" color="primary" fontWeight={700}>
                     #{order.id}
                   </Typography>
@@ -202,14 +247,24 @@ const OrdersPage = () => {
                     icon={getStatusIcon(order.status)}
                   />
                 </Box>
-                
+
                 {/* Date */}
-                <Typography variant="body1" color="text.secondary" gutterBottom sx={{ mb: 2 }}>
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  gutterBottom
+                  sx={{ mb: 2 }}
+                >
                   {formatDate(order.created_at)}
                 </Typography>
-                
+
                 {/* Products count and total */}
-                <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  mb={3}
+                >
                   <Typography variant="body1" fontWeight={500}>
                     {order.items?.length || 0} sản phẩm
                   </Typography>
@@ -217,20 +272,20 @@ const OrdersPage = () => {
                     {formatPrice(order.total_price)}
                   </Typography>
                 </Box>
-                
+
                 {/* Address */}
-                <Typography 
-                  variant="body1" 
-                  color="text.secondary" 
-                  sx={{ 
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    display: '-webkit-box',
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  sx={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "-webkit-box",
                     WebkitLineClamp: 4,
-                    WebkitBoxOrient: 'vertical',
+                    WebkitBoxOrient: "vertical",
                     flexGrow: 1,
                     mb: 3,
-                    lineHeight: 1.6
+                    lineHeight: 1.6,
                   }}
                 >
                   {order.shipping_address}
@@ -238,13 +293,15 @@ const OrdersPage = () => {
 
                 {/* Action button */}
                 <Button
-                  variant={selectedOrder?.id === order.id ? "contained" : "outlined"}
+                  variant={
+                    selectedOrder?.id === order.id ? "contained" : "outlined"
+                  }
                   size="medium"
                   fullWidth
-                  sx={{ 
+                  sx={{
                     py: 1.5,
-                    fontSize: '1rem',
-                    fontWeight: 600
+                    fontSize: "1rem",
+                    fontWeight: 600,
                   }}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -277,15 +334,15 @@ const OrdersPage = () => {
 };
 
 // Component Dialog chi tiết đơn hàng
-const OrderDetailDialog = ({ 
-  open, 
-  onClose, 
-  order, 
-  formatPrice, 
-  formatDate, 
-  getStatusColor, 
-  getStatusText, 
-  getStatusIcon 
+const OrderDetailDialog = ({
+  open,
+  onClose,
+  order,
+  formatPrice,
+  formatDate,
+  getStatusColor,
+  getStatusText,
+  getStatusIcon,
 }) => {
   if (!order) return null;
 
@@ -294,9 +351,7 @@ const OrderDetailDialog = ({
       <DialogTitle>
         <Box display="flex" alignItems="center" gap={1}>
           {getStatusIcon(order.status)}
-          <Typography variant="h6">
-            Chi tiết đơn hàng #{order.id}
-          </Typography>
+          <Typography variant="h6">Chi tiết đơn hàng #{order.id}</Typography>
           <Chip
             label={getStatusText(order.status)}
             color={getStatusColor(order.status)}
@@ -304,7 +359,7 @@ const OrderDetailDialog = ({
           />
         </Box>
       </DialogTitle>
-      
+
       <DialogContent>
         <Grid container spacing={3}>
           {/* Thông tin đơn hàng */}
@@ -312,18 +367,22 @@ const OrderDetailDialog = ({
             <Typography variant="h6" gutterBottom>
               Thông tin đơn hàng
             </Typography>
-            
+
             <Paper sx={{ p: 2 }}>
               <Box display="flex" justifyContent="space-between" sx={{ mb: 1 }}>
                 <Typography variant="body2">Mã đơn hàng:</Typography>
-                <Typography variant="body2" fontWeight="bold">#{order.id}</Typography>
+                <Typography variant="body2" fontWeight="bold">
+                  #{order.id}
+                </Typography>
               </Box>
-              
+
               <Box display="flex" justifyContent="space-between" sx={{ mb: 1 }}>
                 <Typography variant="body2">Ngày đặt:</Typography>
-                <Typography variant="body2">{formatDate(order.created_at)}</Typography>
+                <Typography variant="body2">
+                  {formatDate(order.created_at)}
+                </Typography>
               </Box>
-              
+
               <Box display="flex" justifyContent="space-between" sx={{ mb: 1 }}>
                 <Typography variant="body2">Trạng thái:</Typography>
                 <Chip
@@ -332,16 +391,18 @@ const OrderDetailDialog = ({
                   size="small"
                 />
               </Box>
-              
+
               <Box display="flex" justifyContent="space-between" sx={{ mb: 1 }}>
                 <Typography variant="body2">Phương thức thanh toán:</Typography>
                 <Typography variant="body2">
-                  {order.payment_method === 'cod' ? 'Thanh toán khi nhận hàng' : 
-                   order.payment_method === 'bank_transfer' ? 'Chuyển khoản ngân hàng' : 
-                   order.payment_method}
+                  {order.payment_method === "cod"
+                    ? "Thanh toán khi nhận hàng"
+                    : order.payment_method === "bank_transfer"
+                    ? "Chuyển khoản ngân hàng"
+                    : order.payment_method}
                 </Typography>
               </Box>
-              
+
               <Box display="flex" justifyContent="space-between">
                 <Typography variant="body2">Tổng tiền:</Typography>
                 <Typography variant="h6" color="primary">
@@ -353,11 +414,9 @@ const OrderDetailDialog = ({
             <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
               Địa chỉ giao hàng
             </Typography>
-            
+
             <Paper sx={{ p: 2 }}>
-              <Typography variant="body2">
-                {order.shipping_address}
-              </Typography>
+              <Typography variant="body2">{order.shipping_address}</Typography>
             </Paper>
           </Grid>
 
@@ -366,33 +425,45 @@ const OrderDetailDialog = ({
             <Typography variant="h6" gutterBottom>
               Sản phẩm đã đặt
             </Typography>
-            
+
             <Paper sx={{ p: 2 }}>
               {order.items?.map((item) => (
                 <Box key={item.id} sx={{ mb: 2 }}>
                   <Box display="flex" gap={2}>
                     <Box
                       component="img"
-                      src={item.book?.image_full_url || '/placeholder-book.jpg'}
+                      src={item.book?.image_full_url || "/placeholder-book.jpg"}
                       alt={item.book?.title}
                       sx={{
                         width: 80,
                         height: 100,
-                        objectFit: 'cover',
-                        borderRadius: 1
+                        objectFit: "cover",
+                        borderRadius: 1,
                       }}
                     />
                     <Box flex={1}>
                       <Typography variant="subtitle1" gutterBottom>
                         {item.book?.title}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        gutterBottom
+                      >
                         Tác giả: {item.book?.author?.name}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        gutterBottom
+                      >
                         Thể loại: {item.book?.category?.name}
                       </Typography>
-                      <Box display="flex" justifyContent="space-between" alignItems="center">
+                      <Box
+                        display="flex"
+                        justifyContent="space-between"
+                        alignItems="center"
+                      >
                         <Typography variant="body2">
                           Số lượng: {item.quantity}
                         </Typography>
@@ -409,11 +480,9 @@ const OrderDetailDialog = ({
           </Grid>
         </Grid>
       </DialogContent>
-      
+
       <DialogActions>
-        <Button onClick={onClose}>
-          Đóng
-        </Button>
+        <Button onClick={onClose}>Đóng</Button>
       </DialogActions>
     </Dialog>
   );

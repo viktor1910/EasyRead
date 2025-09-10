@@ -48,9 +48,7 @@ const AppRouter = () => (
         path="/admin"
         element={
           <AuthProtectedRoute requireAdmin={true}>
-            <PageLayout>
-              <AdminPage />
-            </PageLayout>
+            <AdminPage />
           </AuthProtectedRoute>
         }
       />

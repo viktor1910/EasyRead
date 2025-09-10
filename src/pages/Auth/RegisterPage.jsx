@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Container,
   Paper,
@@ -9,22 +9,20 @@ import {
   Alert,
   CircularProgress,
   Link,
-} from '@mui/material';
-import { useAuth } from '../../context/AuthContext/AuthContext';
-import { useNavigate, Link as RouterLink } from 'react-router';
-import RegisterTest from '../../components/RegisterTest';
-import SimpleRegisterTest from '../../components/SimpleRegisterTest';
+} from "@mui/material";
+import { useAuth } from "../../context/AuthContext/AuthContext";
+import { useNavigate, Link as RouterLink } from "react-router";
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmedPassword: '',
+    name: "",
+    email: "",
+    password: "",
+    confirmedPassword: "",
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  
+
   const { register } = useAuth();
   const navigate = useNavigate();
 
@@ -33,17 +31,17 @@ const RegisterPage = () => {
       ...formData,
       [e.target.name]: e.target.value,
     });
-    setError(''); // Clear error when user types
+    setError(""); // Clear error when user types
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     // Validate passwords match
     if (formData.password !== formData.confirmedPassword) {
-      setError('Mật khẩu xác nhận không khớp');
+      setError("Mật khẩu xác nhận không khớp");
       setLoading(false);
       return;
     }
@@ -54,19 +52,19 @@ const RegisterPage = () => {
       formData.password,
       formData.confirmedPassword
     );
-    
+
     if (result.success) {
-      navigate('/');
+      navigate("/");
     } else {
       // Hiển thị lỗi chi tiết nếu có
       if (result.errors) {
         const errorMessages = Object.values(result.errors).flat();
-        setError(errorMessages.join(', '));
+        setError(errorMessages.join(", "));
       } else {
         setError(result.error);
       }
     }
-    
+
     setLoading(false);
   };
 
@@ -75,35 +73,32 @@ const RegisterPage = () => {
       <Box
         sx={{
           marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
       >
         <Paper
           elevation={3}
           sx={{
             padding: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            width: '100%',
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            width: "100%",
           }}
         >
           <Typography component="h1" variant="h4" gutterBottom>
             Đăng ký
           </Typography>
-          
-          <SimpleRegisterTest />
-          <RegisterTest />
-          
+
           {error && (
-            <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+            <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
               {error}
             </Alert>
           )}
 
-          <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
+          <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
             <TextField
               margin="normal"
               required
@@ -162,12 +157,12 @@ const RegisterPage = () => {
               sx={{ mt: 3, mb: 2 }}
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Đăng ký'}
+              {loading ? <CircularProgress size={24} /> : "Đăng ký"}
             </Button>
-            
+
             <Box textAlign="center">
               <Typography variant="body2">
-                Đã có tài khoản?{' '}
+                Đã có tài khoản?{" "}
                 <Link component={RouterLink} to="/login" variant="body2">
                   Đăng nhập ngay
                 </Link>

@@ -8,8 +8,12 @@ import {
   Grid,
   Alert,
 } from "@mui/material";
+import { useAuth } from "../../../context/AuthContext/AuthContext";
+import { useNavigate } from "react-router";
 
 const AccountManagement = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [passwords, setPasswords] = useState({
     currentPassword: "",
     newPassword: "",
@@ -17,9 +21,10 @@ const AccountManagement = () => {
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
 
-  // Giả sử userId được lấy từ context hoặc props
-  const userId = "USER123"; // Thay thế bằng userId thực tế
+  // Lấy thông tin user từ context thay vì hardcode
+  const userId = user?.id || "N/A";
 
   const handlePasswordChange = (event) => {
     const { name, value } = event.target;
@@ -54,6 +59,19 @@ const AccountManagement = () => {
     });
   };
 
+  const handleLogout = async () => {
+    try {
+      setLogoutLoading(true);
+      await logout();
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+      setError("Có lỗi xảy ra khi đăng xuất");
+    } finally {
+      setLogoutLoading(false);
+    }
+  };
+
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h5" gutterBottom>
@@ -70,7 +88,26 @@ const AccountManagement = () => {
               <Typography variant="subtitle1">
                 User ID: <strong>{userId}</strong>
               </Typography>
+              <Typography variant="subtitle1">
+                Tên: <strong>{user?.name || "N/A"}</strong>
+              </Typography>
+              <Typography variant="subtitle1">
+                Email: <strong>{user?.email || "N/A"}</strong>
+              </Typography>
+              <Typography variant="subtitle1">
+                Vai trò: <strong>{user?.role || "N/A"}</strong>
+              </Typography>
             </Box>
+
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={handleLogout}
+              disabled={logoutLoading}
+              sx={{ mt: 2 }}
+            >
+              {logoutLoading ? "Đang đăng xuất..." : "Đăng xuất"}
+            </Button>
           </Paper>
 
           <Paper elevation={3} sx={{ p: 3 }}>
