@@ -6,7 +6,6 @@ import AboutPage from "./pages/About";
 import NotFoundPage from "./pages/404Page";
 import CategoriesPage from "./pages/Categories";
 import ProtectedRoute from "./context/PermissionContext/ProtectedRoute";
-import PublicRoute from "./context/PermissionContext/PublicRoute";
 import BookDetail from "./pages/Book";
 import AdminPage from "./pages/Admin";
 import AuthProtectedRoute from "./context/AuthContext/ProtectedRoute";
@@ -36,14 +35,6 @@ const AppRouter = () => (
         }
       />
       <Route
-        path="/login"
-        element={
-          <PublicRoute>
-            <LoginPage />
-          </PublicRoute>
-        }
-      />
-      <Route
         path="/my-account"
         element={
           <AuthProtectedRoute requireUser={true}>
@@ -63,14 +54,7 @@ const AppRouter = () => (
           </AuthProtectedRoute>
         }
       />
-      <Route
-        path="/admin/*"
-        element={
-          <ProtectedRoute requiredRole="admin">
-            <AdminPage />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/admin/*" element={<AdminPage />} />
       <Route
         path="/about-me"
         element={
