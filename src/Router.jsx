@@ -6,8 +6,12 @@ import AboutPage from "./pages/About";
 import NotFoundPage from "./pages/404Page";
 import CategoriesPage from "./pages/Categories";
 import ProtectedRoute from "./context/PermissionContext/ProtectedRoute";
+import AuthProtectedRoute from "./context/AuthContext/ProtectedRoute";
 import BookDetail from "./pages/Book";
-import AdminPage from "./pages/Admin";
+import LoginPage from "./pages/Auth/LoginPage";
+import RegisterPage from "./pages/Auth/RegisterPage";
+import AdminPage from "./pages/Admin/AdminPage";
+import MyAccountPage from "./pages/MyAccountPage";
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -31,14 +35,23 @@ const AppRouter = () => (
       <Route
         path="/my-account"
         element={
-          <ProtectedRoute>
+          <AuthProtectedRoute requireUser={true}>
             <PageLayout>
-              <div>my account page</div>
+              <MyAccountPage />
             </PageLayout>
-          </ProtectedRoute>
+          </AuthProtectedRoute>
         }
       />
-      <Route path="/admin/*" element={<AdminPage />} />
+      <Route
+        path="/admin"
+        element={
+          <AuthProtectedRoute requireAdmin={true}>
+            <PageLayout>
+              <AdminPage />
+            </PageLayout>
+          </AuthProtectedRoute>
+        }
+      />
       <Route
         path="/about-me"
         element={
@@ -60,6 +73,22 @@ const AppRouter = () => (
         element={
           <PageLayout>
             <BookDetail />
+          </PageLayout>
+        }
+      />
+      <Route
+        path="/login"
+        element={
+          <PageLayout>
+            <LoginPage />
+          </PageLayout>
+        }
+      />
+      <Route
+        path="/register"
+        element={
+          <PageLayout>
+            <RegisterPage />
           </PageLayout>
         }
       />
