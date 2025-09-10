@@ -6,6 +6,7 @@ import theme from "./theme";
 import AppRouter from "./Router.jsx";
 import { QueryProvider } from "./context/QueryProvider";
 import { AuthProvider } from "./context/AuthContext/AuthContext";
+import { CartProvider } from "./context/CartContext/CartContext";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -13,7 +14,9 @@ createRoot(document.getElementById("root")).render(
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <AuthProvider>
-          <AppRouter />
+          <CartProvider>
+            <AppRouter />
+          </CartProvider>
         </AuthProvider>
       </ThemeProvider>
     </QueryProvider>

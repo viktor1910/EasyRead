@@ -13,6 +13,7 @@ import {
   Menu,
   MenuItem,
   InputBase,
+  Badge,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
@@ -20,6 +21,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useAuth } from "../context/AuthContext/AuthContext";
+import { useCart } from "../context/CartContext/CartContext";
 import { useNavigate, Link as RouterLink } from "react-router";
 
 const drawerWidth = 240;
@@ -28,6 +30,7 @@ const PageLayout = ({ children }) => {
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const { user, logout, isAuthenticated, isAdmin } = useAuth();
+  const { cart } = useCart();
   const navigate = useNavigate();
 
   const handleDrawerOpen = () => setOpen(true);
@@ -109,17 +112,30 @@ const PageLayout = ({ children }) => {
             />
           </ListItem>
           {isAuthenticated() && (
-            <ListItem button component={RouterLink} to="/my-account">
-              <ListItemText 
-                primary="My Account" 
-                sx={{ 
-                  color: (theme) => theme.palette.primary.contrastText,
-                  '& .MuiListItemText-primary': {
-                    color: (theme) => theme.palette.primary.contrastText
-                  }
-                }} 
-              />
-            </ListItem>
+            <>
+              <ListItem button component={RouterLink} to="/my-account">
+                <ListItemText 
+                  primary="My Account" 
+                  sx={{ 
+                    color: (theme) => theme.palette.primary.contrastText,
+                    '& .MuiListItemText-primary': {
+                      color: (theme) => theme.palette.primary.contrastText
+                    }
+                  }} 
+                />
+              </ListItem>
+              <ListItem button component={RouterLink} to="/orders">
+                <ListItemText 
+                  primary="Đơn hàng của tôi" 
+                  sx={{ 
+                    color: (theme) => theme.palette.primary.contrastText,
+                    '& .MuiListItemText-primary': {
+                      color: (theme) => theme.palette.primary.contrastText
+                    }
+                  }} 
+                />
+              </ListItem>
+            </>
           )}
           {isAdmin() && (
             <ListItem button component={RouterLink} to="/admin">
@@ -287,8 +303,24 @@ const PageLayout = ({ children }) => {
               <IconButton color="inherit">
                 <FavoriteIcon sx={{ color: (theme) => theme.palette.primary.contrastText }} />
               </IconButton>
-              <IconButton color="inherit">
-                <ShoppingCartIcon sx={{ color: (theme) => theme.palette.primary.contrastText }} />
+              <IconButton 
+                color="inherit"
+                onClick={() => navigate('/cart')}
+                sx={{ position: 'relative' }}
+              >
+                <Badge 
+                  badgeContent={cart?.items_count || 0} 
+                  color="error"
+                  sx={{
+                    '& .MuiBadge-badge': {
+                      fontSize: '0.75rem',
+                      minWidth: '18px',
+                      height: '18px',
+                    }
+                  }}
+                >
+                  <ShoppingCartIcon sx={{ color: (theme) => theme.palette.primary.contrastText }} />
+                </Badge>
               </IconButton>
             </Box>
             
@@ -332,6 +364,14 @@ const PageLayout = ({ children }) => {
                     }}
                   >
                     Tài khoản của tôi
+                  </MenuItem>
+                  <MenuItem 
+                    onClick={() => {
+                      handleClose();
+                      navigate('/orders');
+                    }}
+                  >
+                    Đơn hàng của tôi
                   </MenuItem>
                   <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
                 </Menu>
@@ -389,6 +429,20 @@ const PageLayout = ({ children }) => {
             >
               Trang chủ
             </Button>
+            {isAuthenticated() && (
+              <Button
+                component={RouterLink}
+                to="/orders"
+                sx={{
+                  textDecoration: "none",
+                  color: "inherit",
+                  fontWeight: 500,
+                  textTransform: "none",
+                }}
+              >
+                Đơn hàng
+              </Button>
+            )}
             <Button
               component={RouterLink}
               to="/categories/thieu-nhi"

@@ -12,6 +12,8 @@ import {
 } from '@mui/material';
 import { useAuth } from '../../context/AuthContext/AuthContext';
 import { useNavigate, Link as RouterLink } from 'react-router';
+import RegisterTest from '../../components/RegisterTest';
+import SimpleRegisterTest from '../../components/SimpleRegisterTest';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -91,6 +93,9 @@ const RegisterPage = () => {
           <Typography component="h1" variant="h4" gutterBottom>
             Đăng ký
           </Typography>
+          
+          <SimpleRegisterTest />
+          <RegisterTest />
           
           {error && (
             <Alert severity="error" sx={{ width: '100%', mb: 2 }}>

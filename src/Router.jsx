@@ -12,6 +12,8 @@ import LoginPage from "./pages/Auth/LoginPage";
 import RegisterPage from "./pages/Auth/RegisterPage";
 import AdminPage from "./pages/Admin/AdminPage";
 import MyAccountPage from "./pages/MyAccountPage";
+import CartPage from "./pages/CartPage";
+import OrdersPage from "./pages/OrdersPage";
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -90,6 +92,26 @@ const AppRouter = () => (
           <PageLayout>
             <RegisterPage />
           </PageLayout>
+        }
+      />
+      <Route
+        path="/cart"
+        element={
+          <AuthProtectedRoute requireUser={true}>
+            <PageLayout>
+              <CartPage />
+            </PageLayout>
+          </AuthProtectedRoute>
+        }
+      />
+      <Route
+        path="/orders"
+        element={
+          <AuthProtectedRoute requireUser={true}>
+            <PageLayout>
+              <OrdersPage />
+            </PageLayout>
+          </AuthProtectedRoute>
         }
       />
       <Route path="*" element={<NotFoundPage />} />

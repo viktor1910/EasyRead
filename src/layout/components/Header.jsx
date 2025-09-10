@@ -2,8 +2,8 @@ import React from "react";
 import { Box, InputBase, Button, IconButton, Typography } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { Link } from "react-router";
+import CartIcon from "../../components/CartIcon";
 
 const Header = () => {
   return (
@@ -68,9 +68,7 @@ const Header = () => {
           <IconButton color="inherit">
             <FavoriteIcon />
           </IconButton>
-          <IconButton color="inherit">
-            <ShoppingCartIcon />
-          </IconButton>
+          <CartIcon />
         </Box>
       </Box>
 
@@ -168,6 +166,16 @@ const Header = () => {
             }}
           >
             Giảm giá
+          </Link>
+          <Link
+            to="/orders"
+            style={{
+              textDecoration: "none",
+              color: "inherit",
+              fontWeight: 500,
+            }}
+          >
+            Đơn hàng
           </Link>
         </Box>
       </Box>
