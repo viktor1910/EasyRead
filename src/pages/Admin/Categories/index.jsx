@@ -12,10 +12,14 @@ import {
   Paper,
   TablePagination,
   IconButton,
+  Avatar,
+  CircularProgress,
+  Alert,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import AddCategoryModal from "./components/AddCategory";
+import { useCategories } from "./services";
 
 const CategoryManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,13 +27,8 @@ const CategoryManagement = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  // Dummy data - Replace with API call
-  const [categories] = useState([
-    { id: 1, name: "Sách Văn Học", description: "Các tác phẩm văn học" },
-    { id: 2, name: "Sách Thiếu Nhi", description: "Sách dành cho trẻ em" },
-    { id: 3, name: "Sách Kinh Tế", description: "Sách về kinh tế, kinh doanh" },
-    // Add more dummy data here
-  ]);
+  // Sử dụng react-query để fetch categories
+  const { data: categories = [], isLoading, error, refetch } = useCategories();
 
   const handleOpenModal = (category = null) => {
     setSelectedCategory(category);
@@ -39,16 +38,16 @@ const CategoryManagement = () => {
   const handleCloseModal = () => {
     setSelectedCategory(null);
     setIsModalOpen(false);
+    // Có thể thêm refetch nếu cần thiết, tuy nhiên react-query đã tự động handle
   };
 
   const handleSubmitCategory = (categoryData) => {
     if (selectedCategory) {
       // TODO: Implement update API call
       console.log("Update category:", categoryData);
-    } else {
-      // TODO: Implement create API call
-      console.log("New category:", categoryData);
     }
+    // Không cần xử lý create category ở đây nữa vì đã được xử lý trong AddCategoryModal
+    // React-query sẽ tự động refetch data sau khi mutation thành công
   };
 
   const handleChangePage = (event, newPage) => {
@@ -75,49 +74,102 @@ const CategoryManagement = () => {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => handleOpenModal()}
+          disabled={isLoading}
         >
           Thêm danh mục
         </Button>
       </Box>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Tên danh mục</TableCell>
-              <TableCell>Mô tả</TableCell>
-              <TableCell align="right">Thao tác</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {categories
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((category) => (
-                <TableRow key={category.id}>
-                  <TableCell>{category.name}</TableCell>
-                  <TableCell>{category.description}</TableCell>
-                  <TableCell align="right">
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleOpenModal(category)}
-                    >
-                      <EditIcon />
-                    </IconButton>
+      {/* Loading state */}
+      {isLoading && (
+        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+          <CircularProgress />
+        </Box>
+      )}
+
+      {/* Error state */}
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          Có lỗi xảy ra khi tải dữ liệu: {error.message}
+          <Button onClick={() => refetch()} sx={{ ml: 2 }}>
+            Thử lại
+          </Button>
+        </Alert>
+      )}
+
+      {/* Table - chỉ hiển thị khi không loading và không có lỗi */}
+      {!isLoading && !error && (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Hình ảnh</TableCell>
+                <TableCell>Tên danh mục</TableCell>
+                <TableCell>Slug</TableCell>
+                <TableCell align="right">Thao tác</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {categories.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} align="center" sx={{ py: 4 }}>
+                    <Typography variant="body1" color="text.secondary">
+                      Chưa có danh mục nào. Hãy thêm danh mục đầu tiên!
+                    </Typography>
                   </TableCell>
                 </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={categories.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </TableContainer>
+              ) : (
+                categories
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((category) => (
+                    <TableRow key={category.id}>
+                      <TableCell>
+                        <Avatar
+                          src={category.image}
+                          alt={category.name}
+                          sx={{ width: 50, height: 50 }}
+                          variant="rounded"
+                        />
+                      </TableCell>
+                      <TableCell>{category.name}</TableCell>
+                      <TableCell>
+                        <Box
+                          component="span"
+                          sx={{
+                            backgroundColor: "#f5f5f5",
+                            padding: "4px 8px",
+                            borderRadius: "4px",
+                            fontFamily: "monospace",
+                            fontSize: "0.875rem",
+                          }}
+                        >
+                          {category.slug}
+                        </Box>
+                      </TableCell>
+                      <TableCell align="right">
+                        <IconButton
+                          color="primary"
+                          onClick={() => handleOpenModal(category)}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))
+              )}
+            </TableBody>
+          </Table>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={categories.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </TableContainer>
+      )}
 
       <AddCategoryModal
         open={isModalOpen}

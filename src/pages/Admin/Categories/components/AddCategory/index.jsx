@@ -7,7 +7,10 @@ import {
   DialogActions,
   TextField,
   Box,
+  Typography,
+  CircularProgress,
 } from "@mui/material";
+import { useCreateCategory } from "../../services";
 
 const AddCategoryModal = ({
   open,
@@ -18,19 +21,24 @@ const AddCategoryModal = ({
 }) => {
   const [formData, setFormData] = useState({
     name: "",
-    description: "",
+    slug: "",
+    image: "",
   });
+
+  const createCategoryMutation = useCreateCategory();
 
   useEffect(() => {
     if (initialData) {
       setFormData({
         name: initialData.name || "",
-        description: initialData.description || "",
+        slug: initialData.slug || "",
+        image: initialData.image || "",
       });
     } else {
       setFormData({
         name: "",
-        description: "",
+        slug: "",
+        image: "",
       });
     }
   }, [initialData]);
@@ -41,18 +49,60 @@ const AddCategoryModal = ({
       ...prev,
       [name]: value,
     }));
+
+    // Auto-generate slug from name
+    if (name === "name") {
+      const slug = value
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
+        .replace(/[^a-z0-9 ]/g, "") // Remove special characters
+        .replace(/\s+/g, "-") // Replace spaces with hyphens
+        .replace(/-+/g, "-") // Replace multiple hyphens with single
+        .trim("-"); // Remove leading/trailing hyphens
+
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+        slug: slug,
+      }));
+    }
   };
 
-  const handleSubmit = () => {
-    onSubmit({
-      id: initialData?.id,
-      ...formData,
-    });
-    setFormData({
-      name: "",
-      description: "",
-    });
-    onClose();
+  const handleSubmit = async () => {
+    if (mode === "add") {
+      // Sử dụng react-query mutation để create category
+      try {
+        await createCategoryMutation.mutateAsync({
+          name: formData.name,
+          slug: formData.slug,
+          image: formData.image,
+        });
+
+        // Reset form và đóng modal sau khi thành công
+        setFormData({
+          name: "",
+          slug: "",
+          image: "",
+        });
+        onClose();
+      } catch (error) {
+        console.error("Error creating category:", error);
+        // Có thể thêm thông báo lỗi cho user ở đây
+      }
+    } else {
+      // Giữ nguyên logic cũ cho update mode
+      onSubmit({
+        id: initialData?.id,
+        ...formData,
+      });
+      setFormData({
+        name: "",
+        slug: "",
+        image: "",
+      });
+      onClose();
+    }
   };
 
   return (
@@ -85,15 +135,81 @@ const AddCategoryModal = ({
             }
           />
           <TextField
-            name="description"
-            label="Mô tả"
+            name="slug"
+            label="Slug (URL-friendly name)"
             type="text"
             fullWidth
-            multiline
-            rows={4}
-            value={formData.description}
+            value={formData.slug}
             onChange={handleChange}
+            required
+            error={!formData.slug.trim()}
+            helperText={
+              !formData.slug.trim()
+                ? "Slug không được để trống"
+                : "Slug được tự động tạo từ tên danh mục"
+            }
           />
+          <TextField
+            name="image"
+            label="URL hình ảnh"
+            type="url"
+            fullWidth
+            value={formData.image}
+            onChange={handleChange}
+            placeholder="https://example.com/image.jpg"
+            helperText="Paste URL của hình ảnh danh mục"
+          />
+
+          {/* Image Preview */}
+          {formData.image && (
+            <Box sx={{ mt: 2, mb: 2 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                Xem trước hình ảnh:
+              </Typography>
+              <Box
+                sx={{
+                  width: 120,
+                  height: 120,
+                  border: "2px dashed #ddd",
+                  borderRadius: 2,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  overflow: "hidden",
+                  backgroundColor: "#f9f9f9",
+                }}
+              >
+                <img
+                  src={formData.image}
+                  alt="Preview"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                  onError={(e) => {
+                    e.target.style.display = "none";
+                    e.target.nextSibling.style.display = "flex";
+                  }}
+                />
+                <Box
+                  sx={{
+                    display: "none",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "100%",
+                    height: "100%",
+                    color: "text.secondary",
+                    fontSize: "12px",
+                    textAlign: "center",
+                    px: 1,
+                  }}
+                >
+                  Không thể tải hình ảnh
+                </Box>
+              </Box>
+            </Box>
+          )}
         </Box>
       </DialogContent>
       <DialogActions>
@@ -103,9 +219,22 @@ const AddCategoryModal = ({
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={!formData.name.trim()}
+          disabled={
+            !formData.name.trim() ||
+            !formData.slug.trim() ||
+            createCategoryMutation.isPending
+          }
+          startIcon={
+            createCategoryMutation.isPending && mode === "add" ? (
+              <CircularProgress size={20} />
+            ) : null
+          }
         >
-          {mode === "add" ? "Thêm" : "Cập nhật"}
+          {createCategoryMutation.isPending && mode === "add"
+            ? "Đang thêm..."
+            : mode === "add"
+            ? "Thêm"
+            : "Cập nhật"}
         </Button>
       </DialogActions>
     </Dialog>
