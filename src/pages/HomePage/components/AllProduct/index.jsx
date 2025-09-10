@@ -6,6 +6,7 @@ import { useGetBooks } from "./hook";
 
 const AllProduct = () => {
   const { data } = useGetBooks();
+  console.log(data);
   return (
     <Box p={3} sx={{ backgroundColor: "#f5f5f5", borderRadius: "8px" }}>
       <Typography variant="h2" component="p" mb={2}>

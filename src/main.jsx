@@ -5,17 +5,20 @@ import CssBaseline from "@mui/material/CssBaseline";
 import theme from "./theme";
 import AppRouter from "./Router.jsx";
 import { QueryProvider } from "./context/QueryProvider";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthContext/AuthContext";
+import { CartProvider } from "./context/CartContext/CartContext";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <AuthProvider>
-      <QueryProvider>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <AppRouter />
-        </ThemeProvider>
-      </QueryProvider>
-    </AuthProvider>
+    <QueryProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AuthProvider>
+          <CartProvider>
+            <AppRouter />
+          </CartProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </QueryProvider>
   </StrictMode>
 );

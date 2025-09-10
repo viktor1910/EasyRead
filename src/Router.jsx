@@ -9,7 +9,12 @@ import ProtectedRoute from "./context/PermissionContext/ProtectedRoute";
 import PublicRoute from "./context/PermissionContext/PublicRoute";
 import BookDetail from "./pages/Book";
 import AdminPage from "./pages/Admin";
-import LoginPage from "./pages/Login";
+import AuthProtectedRoute from "./context/AuthContext/ProtectedRoute";
+import LoginPage from "./pages/Auth/LoginPage";
+import RegisterPage from "./pages/Auth/RegisterPage";
+import MyAccountPage from "./pages/MyAccountPage";
+import CartPage from "./pages/CartPage";
+import OrdersPage from "./pages/OrdersPage";
 
 const AppRouter = () => (
   <BrowserRouter>
@@ -41,11 +46,21 @@ const AppRouter = () => (
       <Route
         path="/my-account"
         element={
-          <ProtectedRoute requireAuth={true}>
+          <AuthProtectedRoute requireUser={true}>
             <PageLayout>
-              <div>my account page</div>
+              <MyAccountPage />
             </PageLayout>
-          </ProtectedRoute>
+          </AuthProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <AuthProtectedRoute requireAdmin={true}>
+            <PageLayout>
+              <AdminPage />
+            </PageLayout>
+          </AuthProtectedRoute>
         }
       />
       <Route
@@ -78,6 +93,42 @@ const AppRouter = () => (
           <PageLayout>
             <BookDetail />
           </PageLayout>
+        }
+      />
+      <Route
+        path="/login"
+        element={
+          <PageLayout>
+            <LoginPage />
+          </PageLayout>
+        }
+      />
+      <Route
+        path="/register"
+        element={
+          <PageLayout>
+            <RegisterPage />
+          </PageLayout>
+        }
+      />
+      <Route
+        path="/cart"
+        element={
+          <AuthProtectedRoute requireUser={true}>
+            <PageLayout>
+              <CartPage />
+            </PageLayout>
+          </AuthProtectedRoute>
+        }
+      />
+      <Route
+        path="/orders"
+        element={
+          <AuthProtectedRoute requireUser={true}>
+            <PageLayout>
+              <OrdersPage />
+            </PageLayout>
+          </AuthProtectedRoute>
         }
       />
       <Route path="*" element={<NotFoundPage />} />
