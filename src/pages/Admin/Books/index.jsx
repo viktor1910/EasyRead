@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Typography,
   Box,
@@ -19,9 +19,13 @@ import {
   DialogContentText,
   DialogTitle,
   IconButton,
+  TextField,
+  InputAdornment,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
+import SearchIcon from "@mui/icons-material/Search";
+import ClearIcon from "@mui/icons-material/Clear";
 import AddBook from "./components/AddBook";
 import BookDetail from "./components/BookDetail";
 import { useBooksQuery, useDeleteBookMutation } from "./hooks/useBooksQuery";
@@ -35,6 +39,18 @@ const BookManagement = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [debouncedSearchKeyword, setDebouncedSearchKeyword] = useState("");
+
+  // Debounce search keyword
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchKeyword(searchKeyword);
+      setPage(0); // Reset to first page when search term changes
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [searchKeyword]);
 
   // Fetch books with React Query
   const {
@@ -42,7 +58,11 @@ const BookManagement = () => {
     isLoading,
     error,
     refetch,
-  } = useBooksQuery({ page: page + 1, limit: rowsPerPage });
+  } = useBooksQuery({
+    page: page + 1,
+    limit: rowsPerPage,
+    search: debouncedSearchKeyword || undefined,
+  });
 
   // Delete book mutation
   const deleteBookMutation = useDeleteBookMutation();
@@ -93,6 +113,14 @@ const BookManagement = () => {
     setPage(0);
   };
 
+  const handleSearchChange = (event) => {
+    setSearchKeyword(event.target.value);
+  };
+
+  const handleClearSearch = () => {
+    setSearchKeyword("");
+  };
+
   const handleOpenDeleteModal = (book, event) => {
     event.stopPropagation(); // Prevent row click event
     setBookToDelete(book);
@@ -127,14 +155,41 @@ const BookManagement = () => {
         }}
       >
         <Typography variant="h5">Quản lý sách</Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AddIcon />}
-          onClick={handleOpenAddModal}
-        >
-          Thêm sách
-        </Button>
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+          <TextField
+            size="small"
+            placeholder="Tìm kiếm sách..."
+            value={searchKeyword}
+            onChange={handleSearchChange}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+              endAdornment: searchKeyword && (
+                <InputAdornment position="end">
+                  <IconButton
+                    size="small"
+                    onClick={handleClearSearch}
+                    title="Xóa tìm kiếm"
+                  >
+                    <ClearIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+            sx={{ width: 300 }}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            onClick={handleOpenAddModal}
+          >
+            Thêm sách
+          </Button>
+        </Box>
       </Box>
 
       {error && (

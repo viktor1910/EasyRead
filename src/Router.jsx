@@ -62,10 +62,26 @@ const AppRouter = () => (
         }
       />
       <Route
+        path="/categories"
+        element={
+          <PageLayout>
+            <CategoriesPage />
+          </PageLayout>
+        }
+      />
+      <Route
         path="/categories/:id"
         element={
           <PageLayout>
             <CategoriesPage />
+          </PageLayout>
+        }
+      />
+      <Route
+        path="/book/:slug"
+        element={
+          <PageLayout>
+            <BookDetail />
           </PageLayout>
         }
       />

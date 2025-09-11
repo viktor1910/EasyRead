@@ -48,16 +48,18 @@ interface UseGetBooksParams {
   category_id?: string | number;
   pageIndex?: number;
   pageSize?: number;
+  keyword?: string;
 }
 
 export const useGetBooks = (params: UseGetBooksParams = {}) => {
-  const { category_id, pageIndex = 1, pageSize = 10 } = params;
+  const { category_id, pageIndex = 1, pageSize = 10, keyword } = params;
   return useQuery<BooksPaginationResponse<Book>>({
-    queryKey: ['books', { category_id, pageIndex, pageSize }],
+    queryKey: ['books', { category_id, pageIndex, pageSize, keyword }],
     queryFn: async () => {
       const res = await AxiosConfig.get<BooksPaginationResponse<Book>>('/books', {
         params: {
           ...(category_id ? { category_id } : {}),
+          ...(keyword ? { keyword } : {}),
           pageIndex,
           pageSize,
         },

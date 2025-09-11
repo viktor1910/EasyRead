@@ -71,7 +71,6 @@ const AddBook = ({
       status: "available",
       description: "",
       category_id: "",
-      author_id: "", // Add author_id field
     },
   });
 
@@ -144,7 +143,7 @@ const AddBook = ({
       status: data.status,
       description: data.description || "",
       category_id: parseInt(data.category_id),
-      author_id: parseInt(data.author_id), // Add author_id
+      author_id: 1, // Always send author_id as 1
       image: imageFile,
     };
 
@@ -304,20 +303,6 @@ const AddBook = ({
                 <FormHelperText>Đang tải danh sách thể loại...</FormHelperText>
               )}
             </FormControl>
-
-            {/* Author ID */}
-            <TextField
-              fullWidth
-              label="ID Tác giả *"
-              type="number"
-              inputProps={{ min: 1, step: 1 }}
-              {...register("author_id", {
-                required: "ID Tác giả là bắt buộc",
-                min: { value: 1, message: "ID Tác giả phải lớn hơn 0" },
-              })}
-              error={!!errors.author_id}
-              helperText={errors.author_id?.message}
-            />
 
             {/* Image Upload */}
             <Box>
