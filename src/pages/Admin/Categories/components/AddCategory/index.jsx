@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Dialog,
@@ -9,8 +9,11 @@ import {
   Box,
   Typography,
   CircularProgress,
+  IconButton,
 } from "@mui/material";
-import { useCreateCategory } from "../../services";
+import { PhotoCamera, Delete } from "@mui/icons-material";
+import { useForm, Controller } from "react-hook-form";
+import { useCreateCategory, useUpdateCategory } from "../../services";
 
 const AddCategoryModal = ({
   open,
@@ -19,40 +22,34 @@ const AddCategoryModal = ({
   initialData,
   mode = "add",
 }) => {
-  const [formData, setFormData] = useState({
-    name: "",
-    slug: "",
-    image: "",
+  const [imagePreview, setImagePreview] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const {
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { errors, isValid },
+  } = useForm({
+    defaultValues: {
+      name: "",
+      slug: "",
+      image: null,
+    },
+    mode: "onChange",
   });
 
   const createCategoryMutation = useCreateCategory();
+  const updateCategoryMutation = useUpdateCategory();
 
+  const watchName = watch("name");
+
+  // Auto-generate slug from name
   useEffect(() => {
-    if (initialData) {
-      setFormData({
-        name: initialData.name || "",
-        slug: initialData.slug || "",
-        image: initialData.image || "",
-      });
-    } else {
-      setFormData({
-        name: "",
-        slug: "",
-        image: "",
-      });
-    }
-  }, [initialData]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    // Auto-generate slug from name
-    if (name === "name") {
-      const slug = value
+    if (watchName) {
+      const slug = watchName
         .toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
@@ -61,47 +58,111 @@ const AddCategoryModal = ({
         .replace(/-+/g, "-") // Replace multiple hyphens with single
         .trim("-"); // Remove leading/trailing hyphens
 
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-        slug: slug,
-      }));
+      setValue("slug", slug);
+    }
+  }, [watchName, setValue]);
+
+  // Set initial data when modal opens
+  useEffect(() => {
+    if (open) {
+      if (initialData && mode === "edit") {
+        reset({
+          name: initialData.name || "",
+          slug: initialData.slug || "",
+          image: null,
+        });
+        // Set image preview if editing and has existing image URL
+        if (
+          initialData.image_url &&
+          typeof initialData.image_url === "string"
+        ) {
+          setImagePreview(initialData.image_url);
+        }
+      } else {
+        reset({
+          name: "",
+          slug: "",
+          image: null,
+        });
+        setImagePreview(null);
+        setSelectedImage(null);
+      }
+    }
+  }, [initialData, mode, open, reset]);
+
+  // Handle image file selection
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        alert("Vui lòng chọn file hình ảnh!");
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert("File không được vượt quá 5MB!");
+        return;
+      }
+
+      setSelectedImage(file);
+      setValue("image", file);
+
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  const handleSubmit = async () => {
+  // Handle remove image
+  const handleRemoveImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    setValue("image", null);
+  };
+
+  const onSubmitForm = async (data) => {
     if (mode === "add") {
       // Sử dụng react-query mutation để create category
       try {
         await createCategoryMutation.mutateAsync({
-          name: formData.name,
-          slug: formData.slug,
-          image: formData.image,
+          name: data.name,
+          slug: data.slug,
+          image: selectedImage,
         });
 
         // Reset form và đóng modal sau khi thành công
-        setFormData({
-          name: "",
-          slug: "",
-          image: "",
-        });
+        reset();
+        setImagePreview(null);
+        setSelectedImage(null);
         onClose();
       } catch (error) {
         console.error("Error creating category:", error);
         // Có thể thêm thông báo lỗi cho user ở đây
       }
     } else {
-      // Giữ nguyên logic cũ cho update mode
-      onSubmit({
-        id: initialData?.id,
-        ...formData,
-      });
-      setFormData({
-        name: "",
-        slug: "",
-        image: "",
-      });
-      onClose();
+      // Sử dụng react-query mutation để update category
+      try {
+        await updateCategoryMutation.mutateAsync({
+          id: initialData?.id,
+          name: data.name,
+          slug: data.slug,
+          image: selectedImage,
+        });
+
+        // Reset form và đóng modal sau khi thành công
+        reset();
+        setImagePreview(null);
+        setSelectedImage(null);
+        onClose();
+      } catch (error) {
+        console.error("Error updating category:", error);
+        // Có thể thêm thông báo lỗi cho user ở đây
+      }
     }
   };
 
@@ -118,58 +179,115 @@ const AddCategoryModal = ({
             "& .MuiTextField-root": { mb: 2 },
           }}
           noValidate
-          onSubmit={(e) => e.preventDefault()}
+          onSubmit={handleSubmit(onSubmitForm)}
         >
-          <TextField
+          <Controller
             name="name"
-            autoFocus
-            label="Tên danh mục"
-            type="text"
-            fullWidth
-            value={formData.name}
-            onChange={handleChange}
-            required
-            error={!formData.name.trim()}
-            helperText={
-              !formData.name.trim() ? "Tên danh mục không được để trống" : ""
-            }
-          />
-          <TextField
-            name="slug"
-            label="Slug (URL-friendly name)"
-            type="text"
-            fullWidth
-            value={formData.slug}
-            onChange={handleChange}
-            required
-            error={!formData.slug.trim()}
-            helperText={
-              !formData.slug.trim()
-                ? "Slug không được để trống"
-                : "Slug được tự động tạo từ tên danh mục"
-            }
-          />
-          <TextField
-            name="image"
-            label="URL hình ảnh"
-            type="url"
-            fullWidth
-            value={formData.image}
-            onChange={handleChange}
-            placeholder="https://example.com/image.jpg"
-            helperText="Paste URL của hình ảnh danh mục"
+            control={control}
+            rules={{
+              required: "Tên danh mục không được để trống",
+              minLength: {
+                value: 2,
+                message: "Tên danh mục phải có ít nhất 2 ký tự",
+              },
+            }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                autoFocus
+                label="Tên danh mục"
+                type="text"
+                fullWidth
+                required
+                error={!!errors.name}
+                helperText={errors.name?.message || ""}
+              />
+            )}
           />
 
+          <Controller
+            name="slug"
+            control={control}
+            rules={{
+              required: "Slug không được để trống",
+              minLength: {
+                value: 2,
+                message: "Slug phải có ít nhất 2 ký tự",
+              },
+            }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Slug (URL-friendly name)"
+                type="text"
+                fullWidth
+                required
+                error={!!errors.slug}
+                helperText={
+                  errors.slug?.message ||
+                  "Slug được tự động tạo từ tên danh mục"
+                }
+              />
+            )}
+          />
+
+          {/* Image Upload Section */}
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              Hình ảnh danh mục
+            </Typography>
+
+            <input
+              accept="image/*"
+              style={{ display: "none" }}
+              id="image-upload-button"
+              type="file"
+              onChange={handleImageChange}
+            />
+
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <label htmlFor="image-upload-button">
+                <Button
+                  variant="outlined"
+                  component="span"
+                  startIcon={<PhotoCamera />}
+                  sx={{ mb: imagePreview ? 1 : 0 }}
+                >
+                  Chọn hình ảnh
+                </Button>
+              </label>
+
+              {imagePreview && (
+                <IconButton
+                  onClick={handleRemoveImage}
+                  color="error"
+                  size="small"
+                  sx={{ mb: imagePreview ? 1 : 0 }}
+                >
+                  <Delete />
+                </IconButton>
+              )}
+            </Box>
+
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ display: "block", mt: 0.5 }}
+            >
+              Định dạng: JPG, PNG, GIF. Kích thước tối đa: 5MB
+            </Typography>
+          </Box>
+
           {/* Image Preview */}
-          {formData.image && (
-            <Box sx={{ mt: 2, mb: 2 }}>
+          {imagePreview && (
+            <Box sx={{ mb: 2 }}>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                 Xem trước hình ảnh:
               </Typography>
               <Box
                 sx={{
-                  width: 120,
-                  height: 120,
+                  width: 200,
+                  height: 200,
                   border: "2px dashed #ddd",
                   borderRadius: 2,
                   display: "flex",
@@ -177,10 +295,11 @@ const AddCategoryModal = ({
                   justifyContent: "center",
                   overflow: "hidden",
                   backgroundColor: "#f9f9f9",
+                  position: "relative",
                 }}
               >
                 <img
-                  src={formData.image}
+                  src={imagePreview}
                   alt="Preview"
                   style={{
                     width: "100%",
@@ -217,21 +336,25 @@ const AddCategoryModal = ({
           Hủy
         </Button>
         <Button
-          onClick={handleSubmit}
+          onClick={handleSubmit(onSubmitForm)}
           variant="contained"
           disabled={
-            !formData.name.trim() ||
-            !formData.slug.trim() ||
-            createCategoryMutation.isPending
+            !isValid ||
+            (mode === "add" && !selectedImage) ||
+            createCategoryMutation.isPending ||
+            updateCategoryMutation.isPending
           }
           startIcon={
-            createCategoryMutation.isPending && mode === "add" ? (
+            (createCategoryMutation.isPending && mode === "add") ||
+            (updateCategoryMutation.isPending && mode === "edit") ? (
               <CircularProgress size={20} />
             ) : null
           }
         >
           {createCategoryMutation.isPending && mode === "add"
             ? "Đang thêm..."
+            : updateCategoryMutation.isPending && mode === "edit"
+            ? "Đang cập nhật..."
             : mode === "add"
             ? "Thêm"
             : "Cập nhật"}

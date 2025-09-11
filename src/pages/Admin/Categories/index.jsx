@@ -15,21 +15,31 @@ import {
   Avatar,
   CircularProgress,
   Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import AddCategoryModal from "./components/AddCategory";
-import { useCategories } from "./services";
+import { useCategories, useDeleteCategory } from "./services";
 
 const CategoryManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
 
   // Sử dụng react-query để fetch categories
   const { data: categories = [], isLoading, error, refetch } = useCategories();
+  const deleteCategory = useDeleteCategory();
 
+  console.log("Fetched categories:", categories);
   const handleOpenModal = (category = null) => {
     setSelectedCategory(category);
     setIsModalOpen(true);
@@ -57,6 +67,30 @@ const CategoryManagement = () => {
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+  };
+
+  const handleOpenDeleteDialog = (category) => {
+    setCategoryToDelete(category);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setCategoryToDelete(null);
+    setDeleteDialogOpen(false);
+  };
+
+  const handleConfirmDelete = () => {
+    if (categoryToDelete) {
+      deleteCategory.mutate(categoryToDelete.id, {
+        onSuccess: () => {
+          handleCloseDeleteDialog();
+        },
+        onError: (error) => {
+          console.error("Error deleting category:", error);
+          // Có thể thêm toast notification ở đây
+        },
+      });
+    }
   };
 
   return (
@@ -119,43 +153,59 @@ const CategoryManagement = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                categories
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((category) => (
-                    <TableRow key={category.id}>
-                      <TableCell>
-                        <Avatar
-                          src={category.image}
-                          alt={category.name}
-                          sx={{ width: 50, height: 50 }}
-                          variant="rounded"
-                        />
-                      </TableCell>
-                      <TableCell>{category.name}</TableCell>
-                      <TableCell>
-                        <Box
-                          component="span"
-                          sx={{
-                            backgroundColor: "#f5f5f5",
-                            padding: "4px 8px",
-                            borderRadius: "4px",
-                            fontFamily: "monospace",
-                            fontSize: "0.875rem",
-                          }}
-                        >
-                          {category.slug}
-                        </Box>
-                      </TableCell>
-                      <TableCell align="right">
-                        <IconButton
-                          color="primary"
-                          onClick={() => handleOpenModal(category)}
-                        >
-                          <EditIcon />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                categories.map((category) => (
+                  <TableRow key={category.id}>
+                    <TableCell>
+                      <img
+                        src={category.image_url}
+                        alt={category.name}
+                        style={{
+                          width: 50,
+                          height: 50,
+                          objectFit: "cover",
+                          borderRadius: 4,
+                        }}
+                      />
+                      {/* <Avatar
+                        src={category.image_url}
+                        alt={category.name}
+                        sx={{ width: 50, height: 50 }}
+                        variant="rounded"
+                      /> */}
+                    </TableCell>
+                    <TableCell>{category.name}</TableCell>
+                    <TableCell>
+                      <Box
+                        component="span"
+                        sx={{
+                          backgroundColor: "#f5f5f5",
+                          padding: "4px 8px",
+                          borderRadius: "4px",
+                          fontFamily: "monospace",
+                          fontSize: "0.875rem",
+                        }}
+                      >
+                        {category.slug}
+                      </Box>
+                    </TableCell>
+                    <TableCell align="right">
+                      <IconButton
+                        color="primary"
+                        onClick={() => handleOpenModal(category)}
+                        disabled={deleteCategory.isPending}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        color="error"
+                        onClick={() => handleOpenDeleteDialog(category)}
+                        disabled={deleteCategory.isPending}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
               )}
             </TableBody>
           </Table>
@@ -178,6 +228,45 @@ const CategoryManagement = () => {
         initialData={selectedCategory}
         mode={selectedCategory ? "edit" : "add"}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleCloseDeleteDialog}
+        aria-labelledby="delete-dialog-title"
+        aria-describedby="delete-dialog-description"
+      >
+        <DialogTitle id="delete-dialog-title">
+          Xác nhận xóa danh mục
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="delete-dialog-description">
+            Bạn có chắc chắn muốn xóa danh mục "{categoryToDelete?.name}"?
+            <br />
+            Hành động này không thể hoàn tác.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleCloseDeleteDialog}
+            color="inherit"
+            disabled={deleteCategory.isPending}
+          >
+            Hủy
+          </Button>
+          <Button
+            onClick={handleConfirmDelete}
+            color="error"
+            variant="contained"
+            disabled={deleteCategory.isPending}
+            startIcon={
+              deleteCategory.isPending ? <CircularProgress size={20} /> : null
+            }
+          >
+            {deleteCategory.isPending ? "Đang xóa..." : "Xóa"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

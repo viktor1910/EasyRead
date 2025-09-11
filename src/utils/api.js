@@ -1,12 +1,17 @@
+import AxiosConfig from "../AxiosConfig";
+
 // API utility functions
 const API_BASE_URL = "http://localhost:8000/api";
 
 // Get auth headers from localStorage
-const getAuthHeaders = () => {
+const getAuthHeaders = (isFormData = false) => {
   const token = localStorage.getItem("token");
-  const headers = {
-    "Content-Type": "application/json",
-  };
+  const headers = {};
+
+  // Don't set Content-Type for FormData, let browser set it with boundary
+  if (!isFormData) {
+    headers["Content-Type"] = "application/json";
+  }
 
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
@@ -18,8 +23,12 @@ const getAuthHeaders = () => {
 // Generic API fetch function
 export const apiRequest = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
+
+  // Check if body is FormData
+  const isFormData = options.body instanceof FormData;
+
   const config = {
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders(isFormData),
     ...options,
   };
 
@@ -51,29 +60,6 @@ export const apiRequest = async (endpoint, options = {}) => {
   }
 };
 
-// Book API functions
-export const bookAPI = {
-  getAll: (params = {}) => {
-    const queryString = new URLSearchParams(params).toString();
-    return apiRequest(`/books${queryString ? `?${queryString}` : ""}`);
-  },
-  getById: (id) => apiRequest(`/books/${id}`),
-  create: (data) =>
-    apiRequest("/books", {
-      method: "POST",
-      body: JSON.stringify(data),
-    }),
-  update: (id, data) =>
-    apiRequest(`/books/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(data),
-    }),
-  delete: (id) =>
-    apiRequest(`/books/${id}`, {
-      method: "DELETE",
-    }),
-};
-
 // Author API functions
 export const authorAPI = {
   getAll: () => apiRequest("/authors"),
@@ -98,16 +84,22 @@ export const authorAPI = {
 export const categoryAPI = {
   getAll: () => apiRequest("/categories"),
   getById: (id) => apiRequest(`/categories/${id}`),
-  create: (data) =>
-    apiRequest("/categories", {
+  create: (data) => {
+    // Handle both FormData and regular JSON data
+    const isFormData = data instanceof FormData;
+    return apiRequest("/categories", {
       method: "POST",
-      body: JSON.stringify(data),
-    }),
-  update: (id, data) =>
-    apiRequest(`/categories/${id}`, {
+      body: isFormData ? data : JSON.stringify(data),
+    });
+  },
+  update: (id, data) => {
+    // Handle both FormData and regular JSON data
+    const isFormData = data instanceof FormData;
+    return apiRequest(`/categories/${id}`, {
       method: "PUT",
-      body: JSON.stringify(data),
-    }),
+      body: isFormData ? data : JSON.stringify(data),
+    });
+  },
   delete: (id) =>
     apiRequest(`/categories/${id}`, {
       method: "DELETE",

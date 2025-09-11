@@ -7,18 +7,21 @@ import AppRouter from "./Router.jsx";
 import { QueryProvider } from "./context/QueryProvider";
 import { AuthProvider } from "./context/AuthContext/AuthContext";
 import { CartProvider } from "./context/CartContext/CartContext";
+import { NotificationProvider } from "./context/NotificationContext/NotificationContext";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <QueryProvider>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <AuthProvider>
-          <CartProvider>
-            <AppRouter />
-          </CartProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </QueryProvider>
+    <NotificationProvider>
+      <QueryProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <AuthProvider>
+            <CartProvider>
+              <AppRouter />
+            </CartProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </QueryProvider>
+    </NotificationProvider>
   </StrictMode>
 );

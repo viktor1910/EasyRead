@@ -22,8 +22,11 @@ const CategoryItem = ({ category }) => {
         }}
       >
         <img
-          src="https://contenthub-static.grammarly.com/blog/wp-content/uploads/2022/06/Memoir-vs.-Autobiography-437x233.jpg"
-          alt="Book Cover"
+          src={
+            category?.image_url ||
+            "https://contenthub-static.grammarly.com/blog/wp-content/uploads/2022/06/Memoir-vs.-Autobiography-437x233.jpg"
+          }
+          alt={category?.name || "Book Cover"}
           style={{
             width: "100%",
             height: "100%",

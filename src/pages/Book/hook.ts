@@ -22,6 +22,10 @@ export interface BookDetail {
     id: number;
     name: string;
     slug: string;
+    image: string;
+    image_url: string;
+    created_at: string;
+    updated_at: string;
   };
   author?: {
     id: number;
