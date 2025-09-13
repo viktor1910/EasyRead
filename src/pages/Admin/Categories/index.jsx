@@ -217,6 +217,7 @@ const CategoryManagement = () => {
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="Số hàng mỗi trang:"
           />
         </TableContainer>
       )}
