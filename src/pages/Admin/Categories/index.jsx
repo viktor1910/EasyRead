@@ -25,7 +25,7 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCategoryModal from "./components/AddCategory";
-import { useCategories, useDeleteCategory } from "./services";
+import { useCategories, useDeleteCategory } from "../../services/categories";
 
 const CategoryManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);

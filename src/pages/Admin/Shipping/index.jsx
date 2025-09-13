@@ -32,7 +32,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
-import { useOrders, useUpdateOrderStatus } from "./service";
+import { useOrdersAdmin, useUpdateOrderStatus } from "../../services/orders";
 
 // Tab panel component
 function TabPanel({ children, value, index, ...other }) {
@@ -87,7 +87,7 @@ const ShippingManagement = () => {
     isLoading,
     error,
     refetch,
-  } = useOrders({
+  } = useOrdersAdmin({
     page: page + 1,
     limit: rowsPerPage,
     search: debouncedSearchKeyword || undefined,

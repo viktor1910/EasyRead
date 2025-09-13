@@ -28,7 +28,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
 import AddBook from "./components/AddBook";
 import BookDetail from "./components/BookDetail";
-import { useBooksQuery, useDeleteBookMutation } from "./hooks/useBooksQuery";
+import { useBooks, useDeleteBook } from "../../../services/books";
 
 const BookManagement = () => {
   const [openAddModal, setOpenAddModal] = useState(false);
@@ -58,14 +58,14 @@ const BookManagement = () => {
     isLoading,
     error,
     refetch,
-  } = useBooksQuery({
+  } = useBooks({
     page: page + 1,
     limit: rowsPerPage,
     search: debouncedSearchKeyword || undefined,
   });
 
   // Delete book mutation
-  const deleteBookMutation = useDeleteBookMutation();
+  const deleteBookMutation = useDeleteBook();
 
   const books = booksResponse?.data || [];
   const totalBooks = booksResponse?.total || books.length;

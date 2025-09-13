@@ -1,75 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import AxiosConfig from '../../../AxiosConfig';
+import AxiosConfig from '../../AxiosConfig';
+import { Book, CreateBookRequest, UpdateBookRequest, BooksQueryParams, PaginationResponse } from '../../types/api';
 
-// Interface cho Book model
-export interface Book {
-  id?: number;
-  title: string;
-  slug: string;
-  price: number;
-  discount?: number;
-  stock: number;
-  status: 'available' | 'out_of_stock';
-  description?: string;
-  image?: string; // Relative path từ server
-  image_url?: string; // Full URL từ server
-  category_id: number;
-  category?: {
-    id: number;
-    name: string;
-    slug: string;
-  };
-  created_at?: string;
-  updated_at?: string;
-}
-
-// Interface cho dữ liệu khi tạo book
-export interface CreateBookData {
-  title: string;
-  slug: string;
-  price: number;
-  discount?: number;
-  stock: number;
-  status: 'available' | 'out_of_stock';
-  description?: string;
-  category_id: number;
-  author_id: number;
-  image?: File | null;
-}
-
-// Interface cho dữ liệu khi update book
-export interface UpdateBookData {
-  id: number;
-  title: string;
-  slug: string;
-  price: number;
-  discount?: number;
-  stock: number;
-  status: 'available' | 'out_of_stock';
-  description?: string;
-  category_id: number;
-  author_id: number;
-  image?: File | null;
-}
-
-// Interface cho query parameters
-export interface BooksQueryParams {
-  page?: number;
-  limit?: number;
-  search?: string;
-  category_id?: number;
-  status?: 'available' | 'out_of_stock';
-  sort?: string;
-  order?: 'asc' | 'desc';
-}
-
-// API function để get books với pagination và filter
-const getBooks = async (params: BooksQueryParams = {}): Promise<{
-  data: Book[];
-  total: number;
-  page: number;
-  limit: number;
-}> => {
+// API functions
+const getBooks = async (params: BooksQueryParams = {}): Promise<PaginationResponse<Book>> => {
   const queryString = new URLSearchParams(
     Object.entries(params).reduce((acc, [key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
@@ -83,14 +17,12 @@ const getBooks = async (params: BooksQueryParams = {}): Promise<{
   return response.data;
 };
 
-// API function để get book by id
 const getBookById = async (id: number): Promise<Book> => {
   const response = await AxiosConfig.get(`/books/${id}`);
   return response.data;
 };
 
-// API function để create book
-const createBook = async (bookData: CreateBookData): Promise<Book> => {
+const createBook = async (bookData: CreateBookRequest): Promise<Book> => {
   const formData = new FormData();
   formData.append('title', bookData.title);
   formData.append('slug', bookData.slug);
@@ -120,8 +52,7 @@ const createBook = async (bookData: CreateBookData): Promise<Book> => {
   return response.data;
 };
 
-// API function để update book
-const updateBook = async (bookData: UpdateBookData): Promise<Book> => {
+const updateBook = async (bookData: UpdateBookRequest): Promise<Book> => {
   const { id, ...updateData } = bookData;
   const formData = new FormData();
   formData.append('title', updateData.title);
@@ -152,12 +83,11 @@ const updateBook = async (bookData: UpdateBookData): Promise<Book> => {
   return response.data;
 };
 
-// API function để delete book
 const deleteBook = async (id: number): Promise<void> => {
   await AxiosConfig.delete(`/books/${id}`);
 };
 
-// React Query hook để get books với pagination
+// React Query hooks
 export const useBooks = (params: BooksQueryParams = {}) => {
   return useQuery({
     queryKey: ['books', params],
@@ -166,7 +96,6 @@ export const useBooks = (params: BooksQueryParams = {}) => {
   });
 };
 
-// React Query hook để get book by id
 export const useBook = (id: number, options: { enabled?: boolean } = {}) => {
   return useQuery({
     queryKey: ['book', id],
@@ -176,16 +105,13 @@ export const useBook = (id: number, options: { enabled?: boolean } = {}) => {
   });
 };
 
-// React Query hook để create book
 export const useCreateBook = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: createBook,
     onSuccess: () => {
-      // Invalidate và refetch books list sau khi tạo thành công
       queryClient.invalidateQueries({ queryKey: ['books'] });
-      // Remove specific query cache if needed
       queryClient.removeQueries({ queryKey: ['books'] });
     },
     onError: (error) => {
@@ -194,18 +120,14 @@ export const useCreateBook = () => {
   });
 };
 
-// React Query hook để update book
 export const useUpdateBook = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: updateBook,
     onSuccess: (data, variables) => {
-      // Invalidate và refetch books list sau khi update thành công
       queryClient.invalidateQueries({ queryKey: ['books'] });
-      // Update specific book cache
       queryClient.setQueryData(['book', variables.id], data);
-      // Remove books list cache để force refetch
       queryClient.removeQueries({ queryKey: ['books'] });
     },
     onError: (error) => {
@@ -214,16 +136,13 @@ export const useUpdateBook = () => {
   });
 };
 
-// React Query hook để delete book
 export const useDeleteBook = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: deleteBook,
     onSuccess: () => {
-      // Invalidate và refetch books list sau khi delete thành công
       queryClient.invalidateQueries({ queryKey: ['books'] });
-      // Remove specific query cache if needed
       queryClient.removeQueries({ queryKey: ['books'] });
     },
     onError: (error) => {
@@ -231,3 +150,10 @@ export const useDeleteBook = () => {
     },
   });
 };
+
+// Legacy compatibility exports
+export const useBooksQuery = useBooks;
+export const useBookQuery = useBook;
+export const useCreateBookMutation = useCreateBook;
+export const useUpdateBookMutation = useUpdateBook;
+export const useDeleteBookMutation = useDeleteBook;

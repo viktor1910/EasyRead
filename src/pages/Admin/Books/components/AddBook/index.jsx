@@ -18,11 +18,8 @@ import {
   CircularProgress,
   Alert,
 } from "@mui/material";
-import {
-  useCreateBookMutation,
-  useUpdateBookMutation,
-} from "../../hooks/useBooksQuery";
-import { useCategoriesQuery } from "../../hooks/useCategoriesQuery";
+import { useCreateBook, useUpdateBook } from "../../../../../services/books";
+import { useCategories } from "../../../../../services/categories";
 import { useNotification } from "../../../../../context/NotificationContext/NotificationContext";
 
 const AddBook = ({
@@ -43,13 +40,13 @@ const AddBook = ({
     data: categories = [],
     isLoading: loadingCategories,
     error: categoriesError,
-  } = useCategoriesQuery({ enabled: open });
+  } = useCategories({ enabled: open });
 
   // Create book mutation
-  const createBookMutation = useCreateBookMutation();
+  const createBookMutation = useCreateBook();
 
   // Update book mutation
-  const updateBookMutation = useUpdateBookMutation();
+  const updateBookMutation = useUpdateBook();
 
   const isLoading =
     createBookMutation.isPending || updateBookMutation.isPending;

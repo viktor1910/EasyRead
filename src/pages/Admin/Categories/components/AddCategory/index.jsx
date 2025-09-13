@@ -13,7 +13,10 @@ import {
 } from "@mui/material";
 import { PhotoCamera, Delete } from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
-import { useCreateCategory, useUpdateCategory } from "../../services";
+import {
+  useCreateCategory,
+  useUpdateCategory,
+} from "../../../../services/categories";
 
 const AddCategoryModal = ({
   open,
