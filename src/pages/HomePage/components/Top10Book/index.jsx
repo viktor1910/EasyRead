@@ -1,9 +1,47 @@
 import React from "react";
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography, CircularProgress } from "@mui/material";
 import BookItem from "../BookItem";
 import BookTopItem from "../BookItem/BookTopItem";
 import Carousel from "../../../../components/Carousel";
+import { useMostOrderedBooksQuery } from "../../../../services/books/booksService";
+
 const Top10Book = () => {
+  const {
+    data: mostOrderedBooks,
+    isLoading,
+    isError,
+    error,
+  } = useMostOrderedBooksQuery();
+
+  if (isLoading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="300px"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Box>
+        <Typography variant="h2" component="p" mb={2}>
+          Top 10 sách bán chạy nhất:
+        </Typography>
+        <Typography variant="body1" color="error">
+          Không thể tải dữ liệu sách bán chạy. Vui lòng thử lại sau.
+        </Typography>
+      </Box>
+    );
+  }
+
+  const books = mostOrderedBooks || [];
+  const topBooks = books.slice(0, 10); // Ensure we only get top 10
+
   return (
     <Box>
       <Typography variant="h2" component="p" mb={2}>
@@ -11,18 +49,11 @@ const Top10Book = () => {
       </Typography>
 
       <Carousel
-        items={[
-          <BookTopItem top={1} />,
-          <BookTopItem top={2} />,
-          <BookTopItem top={3} />,
-          <BookTopItem top={4} />,
-          <BookTopItem top={5} />,
-          <BookTopItem top={6} />,
-          <BookTopItem top={7} />,
-          <BookTopItem top={8} />,
-          <BookTopItem top={9} />,
-          <BookTopItem top={10} />,
-        ]}
+        items={
+          topBooks?.map((book, index) => (
+            <BookTopItem key={book.id} top={index + 1} book={book} />
+          )) || []
+        }
       />
     </Box>
   );

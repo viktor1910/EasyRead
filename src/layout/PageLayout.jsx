@@ -120,17 +120,25 @@ const PageLayout = ({ children }) => {
           }}
         >
           <Toolbar>
-            <Typography
-              variant="h6"
-              color="inherit"
-              noWrap
+            <Box
+              component={RouterLink}
+              to="/"
               sx={{
-                color: (theme) => theme.palette.primary.contrastText,
+                display: "flex",
+                alignItems: "center",
+                textDecoration: "none",
                 flexGrow: 1,
               }}
             >
-              EasyRead
-            </Typography>
+              <img
+                src="/logo.png"
+                alt="EasyRead"
+                style={{
+                  height: "70px",
+                  width: "auto",
+                }}
+              />
+            </Box>
 
             {/* Search Bar */}
             <ClickAwayListener onClickAway={handleClickAway}>
@@ -486,42 +494,6 @@ const PageLayout = ({ children }) => {
               }}
             >
               Ngôn tình
-            </Button>
-            <Button
-              component={RouterLink}
-              to="/categories/best-seller"
-              sx={{
-                textDecoration: "none",
-                color: "inherit",
-                fontWeight: 500,
-                textTransform: "none",
-              }}
-            >
-              Bán chạy
-            </Button>
-            <Button
-              component={RouterLink}
-              to="/new-arrivals"
-              sx={{
-                textDecoration: "none",
-                color: "inherit",
-                fontWeight: 500,
-                textTransform: "none",
-              }}
-            >
-              Mới về
-            </Button>
-            <Button
-              component={RouterLink}
-              to="/sale"
-              sx={{
-                textDecoration: "none",
-                color: "inherit",
-                fontWeight: 500,
-                textTransform: "none",
-              }}
-            >
-              Giảm giá
             </Button>
           </Box>
         </Box>

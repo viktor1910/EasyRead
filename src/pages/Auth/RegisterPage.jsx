@@ -54,7 +54,12 @@ const RegisterPage = () => {
     );
 
     if (result.success) {
-      navigate("/");
+      // Check if user is admin after registration to redirect accordingly
+      if (result.user && result.user.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     } else {
       // Hiển thị lỗi chi tiết nếu có
       if (result.errors) {

@@ -60,7 +60,7 @@ const updateCategory = async (categoryData: UpdateCategoryData): Promise<Categor
     formData.append('image', updateData.image);
   }
   
-  const response = await AxiosConfig.put(`/categories/${id}`, formData, {
+  const response = await AxiosConfig.post(`/categories/${id}/update`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },

@@ -36,8 +36,9 @@ AxiosConfig.interceptors.response.use(
       // Token hết hạn hoặc không hợp lệ
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      // Redirect to login page
-      window.location.href = '/login';
+      // // Redirect to login page
+      // window.location.href = '/login';
+      console.log('aaaaaaaaaaaaaa')
     }
     return Promise.reject(error);
   }

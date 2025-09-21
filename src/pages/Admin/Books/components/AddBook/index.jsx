@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Button,
@@ -18,11 +18,8 @@ import {
   CircularProgress,
   Alert,
 } from "@mui/material";
-import {
-  useCreateBookMutation,
-  useUpdateBookMutation,
-} from "../../hooks/useBooksQuery";
-import { useCategoriesQuery } from "../../hooks/useCategoriesQuery";
+import { useCreateBook, useUpdateBook } from "../../../../../services/books";
+import { useCategories } from "../../../../../services/categories";
 import { useNotification } from "../../../../../context/NotificationContext/NotificationContext";
 
 const AddBook = ({
@@ -43,13 +40,13 @@ const AddBook = ({
     data: categories = [],
     isLoading: loadingCategories,
     error: categoriesError,
-  } = useCategoriesQuery({ enabled: open });
+  } = useCategories({ enabled: open });
 
   // Create book mutation
-  const createBookMutation = useCreateBookMutation();
+  const createBookMutation = useCreateBook();
 
   // Update book mutation
-  const updateBookMutation = useUpdateBookMutation();
+  const updateBookMutation = useUpdateBook();
 
   const isLoading =
     createBookMutation.isPending || updateBookMutation.isPending;
@@ -61,6 +58,7 @@ const AddBook = ({
     reset,
     setValue,
     watch,
+    control,
   } = useForm({
     defaultValues: {
       title: "",
@@ -68,7 +66,7 @@ const AddBook = ({
       price: "",
       discount: "",
       stock: "",
-      status: "available",
+      status: "available", // Only default for new books
       description: "",
       category_id: "",
     },
@@ -81,19 +79,38 @@ const AddBook = ({
       setImageFile(null);
       setImagePreview("");
       if (initialBookData && isEdit) {
-        // Populate form with existing data
-        Object.keys(initialBookData).forEach((key) => {
-          setValue(key, initialBookData[key]);
+        // Populate form with existing data using reset with new values
+        reset({
+          title: initialBookData.title || "",
+          slug: initialBookData.slug || "",
+          price: initialBookData.price || "",
+          discount: initialBookData.discount || "",
+          stock: initialBookData.stock || "",
+          status: initialBookData.status || "available",
+          description: initialBookData.description || "",
+          category_id: initialBookData.category_id || "",
         });
-        // Set image preview if exists
-        if (initialBookData.image_url) {
-          setImagePreview(initialBookData.image_url);
+        // Set image preview if exists - use image_full_url first, then image_url as fallback
+        if (initialBookData.image_full_url || initialBookData.image_url) {
+          setImagePreview(
+            initialBookData.image_full_url || initialBookData.image_url
+          );
         }
       } else {
-        reset();
+        // Reset to default values for new book
+        reset({
+          title: "",
+          slug: "",
+          price: "",
+          discount: "",
+          stock: "",
+          status: "available",
+          description: "",
+          category_id: "",
+        });
       }
     }
-  }, [open, initialBookData, isEdit, setValue, reset]);
+  }, [open, initialBookData, isEdit, reset]);
 
   // Auto-generate slug from title
   const titleValue = watch("title");
@@ -121,7 +138,7 @@ const AddBook = ({
     const file = event.target.files[0];
     if (file) {
       setImageFile(file);
-      // Create preview URL
+      // Create preview URL for new uploaded image
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
@@ -213,21 +230,21 @@ const AddBook = ({
             />
 
             {/* Status */}
-            <FormControl fullWidth error={!!errors.status}>
-              <InputLabel>Trạng thái *</InputLabel>
-              <Select
-                label="Trạng thái *"
-                {...register("status", {
-                  required: "Trạng thái là bắt buộc",
-                })}
-              >
-                <MenuItem value="available">Còn hàng</MenuItem>
-                <MenuItem value="out_of_stock">Hết hàng</MenuItem>
-              </Select>
-              {errors.status && (
-                <FormHelperText>{errors.status.message}</FormHelperText>
+            <Controller
+              name="status"
+              control={control}
+              rules={{ required: "Trạng thái là bắt buộc" }}
+              render={({ field, fieldState: { error } }) => (
+                <FormControl fullWidth error={!!error}>
+                  <InputLabel>Trạng thái *</InputLabel>
+                  <Select {...field} label="Trạng thái *">
+                    <MenuItem value="available">Còn hàng</MenuItem>
+                    <MenuItem value="out_of_stock">Hết hàng</MenuItem>
+                  </Select>
+                  {error && <FormHelperText>{error.message}</FormHelperText>}
+                </FormControl>
               )}
-            </FormControl>
+            />
 
             {/* Price */}
             <TextField
@@ -281,28 +298,33 @@ const AddBook = ({
             />
 
             {/* Category */}
-            <FormControl fullWidth error={!!errors.category_id}>
-              <InputLabel>Thể loại *</InputLabel>
-              <Select
-                label="Thể loại *"
-                {...register("category_id", {
-                  required: "Thể loại là bắt buộc",
-                })}
-                disabled={loadingCategories}
-              >
-                {categories.map((category) => (
-                  <MenuItem key={category.id} value={category.id}>
-                    {category.name}
-                  </MenuItem>
-                ))}
-              </Select>
-              {errors.category_id && (
-                <FormHelperText>{errors.category_id.message}</FormHelperText>
+            <Controller
+              name="category_id"
+              control={control}
+              rules={{ required: "Thể loại là bắt buộc" }}
+              render={({ field, fieldState: { error } }) => (
+                <FormControl fullWidth error={!!error}>
+                  <InputLabel>Thể loại *</InputLabel>
+                  <Select
+                    {...field}
+                    label="Thể loại *"
+                    disabled={loadingCategories}
+                  >
+                    {categories.map((category) => (
+                      <MenuItem key={category.id} value={category.id}>
+                        {category.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {error && <FormHelperText>{error.message}</FormHelperText>}
+                  {loadingCategories && (
+                    <FormHelperText>
+                      Đang tải danh sách thể loại...
+                    </FormHelperText>
+                  )}
+                </FormControl>
               )}
-              {loadingCategories && (
-                <FormHelperText>Đang tải danh sách thể loại...</FormHelperText>
-              )}
-            </FormControl>
+            />
 
             {/* Image Upload */}
             <Box>
@@ -315,7 +337,7 @@ const AddBook = ({
                 fullWidth
                 sx={{ mb: 2 }}
               >
-                Chọn hình ảnh
+                {imageFile ? "Thay đổi hình ảnh" : "Chọn hình ảnh"}
                 <input
                   type="file"
                   accept="image/*"
@@ -336,6 +358,9 @@ const AddBook = ({
                       borderRadius: "4px",
                     }}
                   />
+                  <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                    {imageFile ? "Hình ảnh mới" : "Hình ảnh hiện tại"}
+                  </Typography>
                 </Box>
               )}
             </Box>

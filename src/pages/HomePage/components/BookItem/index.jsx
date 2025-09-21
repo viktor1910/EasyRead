@@ -91,7 +91,21 @@ const BookItem = ({ book }) => {
           </Box>
         )}
       </Box>
-      <Typography variant="h6" fontWeight={700} pl={1} mb={0.5}>
+      <Typography
+        variant="h6"
+        fontWeight={700}
+        pl={1}
+        mb={0.5}
+        sx={{
+          display: "-webkit-box",
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          lineHeight: 1.2,
+          maxHeight: "2.4em", // 2 lines * line-height
+        }}
+      >
         {book.title}
       </Typography>
       <Typography variant="body2" pl={1}>

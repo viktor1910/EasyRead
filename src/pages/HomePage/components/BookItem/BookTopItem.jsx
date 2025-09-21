@@ -1,5 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import React, { useState } from "react";
+import { useNavigate } from "react-router";
 import {
   Number1,
   Number2,
@@ -13,8 +14,27 @@ import {
   Number10,
 } from "../../../../components/Icon/Top10Number";
 
-const BookTopItem = ({ top }) => {
+const BookTopItem = ({ top, book }) => {
   const [hovered, setHovered] = useState(false);
+  const navigate = useNavigate();
+
+  // Default fallback data when no book is provided
+  const bookTitle = book?.title || "Book Title";
+  // Handle author as either a string or an object with name property
+  const bookAuthor =
+    typeof book?.author === "string"
+      ? book.author
+      : book?.author?.name || "Author Name";
+  const bookImage =
+    book?.image_full_url ||
+    "https://salt.tikicdn.com/cache/750x750/ts/product/e2/9e/ed/e1dbece01b595a871eadb52369e3b20c.jpg.webp";
+
+  console.log("BookTopItem book", book);
+  const handleClick = () => {
+    if (book?.id) {
+      navigate(`/books/${book.id}`);
+    }
+  };
 
   return (
     <Box
@@ -27,6 +47,7 @@ const BookTopItem = ({ top }) => {
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={handleClick}
       style={{
         transform: hovered ? "scale(1.08)" : "scale(1)",
         boxShadow: hovered
@@ -74,8 +95,8 @@ const BookTopItem = ({ top }) => {
             mb={1}
           >
             <img
-              src="https://salt.tikicdn.com/cache/750x750/ts/product/e2/9e/ed/e1dbece01b595a871eadb52369e3b20c.jpg.webp"
-              alt="Book Cover"
+              src={bookImage}
+              alt={`${bookTitle} cover`}
               style={{
                 width: "100%",
                 height: "100%",
@@ -84,27 +105,6 @@ const BookTopItem = ({ top }) => {
                 transition: "border-radius 0.3s",
               }}
             />
-            {hovered && (
-              <Box
-                sx={{
-                  position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  width: "100%",
-                  color: "#fff",
-                  p: 2,
-                  borderBottomLeftRadius: 8,
-                  borderBottomRightRadius: 8,
-                  transition: "opacity 0.3s",
-                  opacity: hovered ? 1 : 0,
-                }}
-              >
-                <Typography variant="h6" fontWeight={700}>
-                  Book Title
-                </Typography>
-                <Typography variant="body2">Author Name</Typography>
-              </Box>
-            )}
           </Box>
         </Box>
       </Box>

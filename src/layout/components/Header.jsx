@@ -31,9 +31,18 @@ const Header = () => {
         }}
       >
         {/* Logo */}
-        <Typography variant="h5" component="div" sx={{ fontWeight: "bold" }}>
-          EasyRead
-        </Typography>
+        <Link to="/" style={{ textDecoration: "none" }}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <img
+              src="/logo.png"
+              alt="EasyRead"
+              style={{
+                height: "40px",
+                width: "auto",
+              }}
+            />
+          </Box>
+        </Link>
 
         {/* Search Bar */}
         <Box
@@ -136,36 +145,6 @@ const Header = () => {
             }}
           >
             Ngôn tình
-          </Link>
-          <Link
-            to="/categories/best-seller"
-            style={{
-              textDecoration: "none",
-              color: "inherit",
-              fontWeight: 500,
-            }}
-          >
-            Bán chạy
-          </Link>
-          <Link
-            to="/new-arrivals"
-            style={{
-              textDecoration: "none",
-              color: "inherit",
-              fontWeight: 500,
-            }}
-          >
-            Mới về
-          </Link>
-          <Link
-            to="/sale"
-            style={{
-              textDecoration: "none",
-              color: "inherit",
-              fontWeight: 500,
-            }}
-          >
-            Giảm giá
           </Link>
           <Link
             to="/orders"

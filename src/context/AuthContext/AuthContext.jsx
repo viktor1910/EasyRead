@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { authAPI } from "../../utils/api";
+import { authAPI } from "../../services/auth";
 
 const AuthContext = createContext();
 
@@ -34,27 +34,21 @@ export const AuthProvider = ({ children }) => {
 
       // Backend trả về { message, user, token }
       if (response.user && response.token) {
-        setUser({
+        const userData = {
           id: response.user.id,
           name: response.user.name,
           email: response.user.email,
           role: response.user.role,
-        });
+        };
+
+        setUser(userData);
         setToken(response.token);
 
         // Lưu vào localStorage
         localStorage.setItem("token", response.token);
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            id: response.user.id,
-            name: response.user.name,
-            email: response.user.email,
-            role: response.user.role,
-          })
-        );
+        localStorage.setItem("user", JSON.stringify(userData));
 
-        return { success: true };
+        return { success: true, user: userData };
       } else {
         return {
           success: false,
@@ -77,27 +71,21 @@ export const AuthProvider = ({ children }) => {
 
       // Backend trả về { message, user, token }
       if (response.user && response.token) {
-        setUser({
+        const userData = {
           id: response.user.id,
           name: response.user.name,
           email: response.user.email,
           role: response.user.role,
-        });
+        };
+
+        setUser(userData);
         setToken(response.token);
 
         // Lưu vào localStorage
         localStorage.setItem("token", response.token);
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            id: response.user.id,
-            name: response.user.name,
-            email: response.user.email,
-            role: response.user.role,
-          })
-        );
+        localStorage.setItem("user", JSON.stringify(userData));
 
-        return { success: true };
+        return { success: true, user: userData };
       } else {
         return {
           success: false,

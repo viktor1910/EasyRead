@@ -17,12 +17,10 @@ const BookDetail = ({ open, handleClose, book, onEdit }) => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "active":
+      case "available":
         return "success";
-      case "inactive":
+      case "out_of_stock":
         return "error";
-      case "draft":
-        return "warning";
       default:
         return "default";
     }
@@ -30,12 +28,10 @@ const BookDetail = ({ open, handleClose, book, onEdit }) => {
 
   const getStatusText = (status) => {
     switch (status) {
-      case "active":
-        return "Hoạt động";
-      case "inactive":
-        return "Không hoạt động";
-      case "draft":
-        return "Bản nháp";
+      case "available":
+        return "Còn hàng";
+      case "out_of_stock":
+        return "Hết hàng";
       default:
         return status;
     }
@@ -62,7 +58,7 @@ const BookDetail = ({ open, handleClose, book, onEdit }) => {
           <Grid item xs={12} md={4}>
             <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
               <Avatar
-                src={book.image_url}
+                src={book.image_full_url || book.image_url}
                 alt={book.title}
                 variant="rounded"
                 sx={{

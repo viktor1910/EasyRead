@@ -4,7 +4,7 @@ import {
   useCreateBook,
   useUpdateBook,
   useDeleteBook,
-} from "../services";
+} from "../../../../services/books";
 
 // Re-export với tên cũ để tương thích
 export const useBooksQuery = useBooks;
