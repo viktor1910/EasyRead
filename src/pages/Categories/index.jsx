@@ -115,9 +115,7 @@ const CategoriesPage = () => {
           >
             <Typography variant="h1">
               {id
-                ? loadingCategoryDetail
-                  ? `Danh mục: ${id}`
-                  : `Danh mục: ${categoryDetail?.name || id}`
+                ? `Danh mục: ${categoryDetail?.name || id}`
                 : "Tất cả danh mục"}
             </Typography>
             <TextField
