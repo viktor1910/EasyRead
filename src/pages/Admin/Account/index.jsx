@@ -1,63 +1,15 @@
-import React, { useState } from "react";
-import {
-  Typography,
-  Box,
-  TextField,
-  Button,
-  Paper,
-  Grid,
-  Alert,
-} from "@mui/material";
+import { useState } from "react";
+import { Typography, Box, Button, Paper, Grid } from "@mui/material";
 import { useAuth } from "../../../context/AuthContext/AuthContext";
 import { useNavigate } from "react-router";
 
 const AccountManagement = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [passwords, setPasswords] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
   const [logoutLoading, setLogoutLoading] = useState(false);
 
   // Lấy thông tin user từ context thay vì hardcode
   const userId = user?.id || "N/A";
-
-  const handlePasswordChange = (event) => {
-    const { name, value } = event.target;
-    setPasswords((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    setError("");
-    setSuccess(false);
-
-    if (passwords.newPassword !== passwords.confirmPassword) {
-      setError("Mật khẩu mới không khớp!");
-      return;
-    }
-
-    if (passwords.newPassword.length < 6) {
-      setError("Mật khẩu mới phải có ít nhất 6 ký tự!");
-      return;
-    }
-
-    // TODO: Gọi API để thay đổi mật khẩu
-    console.log("Đổi mật khẩu:", passwords);
-    setSuccess(true);
-    setPasswords({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
-  };
 
   const handleLogout = async () => {
     try {
@@ -108,65 +60,6 @@ const AccountManagement = () => {
             >
               {logoutLoading ? "Đang đăng xuất..." : "Đăng xuất"}
             </Button>
-          </Paper>
-
-          <Paper elevation={3} sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Đổi mật khẩu
-            </Typography>
-            <form onSubmit={handleSubmit}>
-              <TextField
-                fullWidth
-                margin="normal"
-                type="password"
-                label="Mật khẩu hiện tại"
-                name="currentPassword"
-                value={passwords.currentPassword}
-                onChange={handlePasswordChange}
-                required
-              />
-              <TextField
-                fullWidth
-                margin="normal"
-                type="password"
-                label="Mật khẩu mới"
-                name="newPassword"
-                value={passwords.newPassword}
-                onChange={handlePasswordChange}
-                required
-              />
-              <TextField
-                fullWidth
-                margin="normal"
-                type="password"
-                label="Xác nhận mật khẩu mới"
-                name="confirmPassword"
-                value={passwords.confirmPassword}
-                onChange={handlePasswordChange}
-                required
-              />
-
-              {error && (
-                <Alert severity="error" sx={{ mt: 2 }}>
-                  {error}
-                </Alert>
-              )}
-
-              {success && (
-                <Alert severity="success" sx={{ mt: 2 }}>
-                  Đổi mật khẩu thành công!
-                </Alert>
-              )}
-
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                sx={{ mt: 3 }}
-              >
-                Đổi mật khẩu
-              </Button>
-            </form>
           </Paper>
         </Grid>
       </Grid>

@@ -17,6 +17,7 @@ import { useGetCategories } from "../HomePage/components/Categories/hook";
 import { useGetBooks } from "../HomePage/components/AllProduct/hook";
 import BookItem from "../HomePage/components/BookItem";
 import { useNavigate } from "react-router";
+import { useCategory } from "../../services/categories/categoriesService";
 const CategoriesPage = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
@@ -47,6 +48,10 @@ const CategoriesPage = () => {
     category_id: id,
     keyword: debouncedSearchKeyword || undefined,
   });
+
+  // Get category detail when id is available
+  const { data: categoryDetail, isLoading: loadingCategoryDetail } =
+    useCategory(parseInt(id), { enabled: !!id });
 
   const handleSearchChange = (event) => {
     setSearchKeyword(event.target.value);
@@ -109,7 +114,11 @@ const CategoriesPage = () => {
             }}
           >
             <Typography variant="h1">
-              {id ? `Danh mục: ${id}` : "Tất cả danh mục"}
+              {id
+                ? loadingCategoryDetail
+                  ? `Danh mục: ${id}`
+                  : `Danh mục: ${categoryDetail?.name || id}`
+                : "Tất cả danh mục"}
             </Typography>
             <TextField
               size="small"

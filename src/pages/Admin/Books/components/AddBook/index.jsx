@@ -69,6 +69,7 @@ const AddBook = ({
       status: "available", // Only default for new books
       description: "",
       category_id: "",
+      author: 1, // Always send author_id as 1
     },
   });
 
@@ -160,7 +161,7 @@ const AddBook = ({
       status: data.status,
       description: data.description || "",
       category_id: parseInt(data.category_id),
-      author_id: 1, // Always send author_id as 1
+      author_id: 1,
       image: imageFile,
     };
 

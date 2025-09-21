@@ -30,26 +30,16 @@ const getBookBySlug = async (slug: string): Promise<Book> => {
 
 const createBook = async (bookData: CreateBookRequest): Promise<Book> => {
   const formData = new FormData();
-  formData.append('title', bookData.title);
-  formData.append('slug', bookData.slug);
-  formData.append('author', bookData.author);
-  formData.append('price', String(bookData.price));
-  formData.append('stock', String(bookData.stock));
-  formData.append('status', bookData.status);
-  formData.append('category_id', String(bookData.category_id));
   
-  if (bookData.description) {
-    formData.append('description', bookData.description);
-  }
-  if (bookData.discount) {
-    formData.append('discount', String(bookData.discount));
-  }
-  if (bookData.image) {
-    formData.append('image', bookData.image);
-  }
-  if (bookData.pdf) {
-    formData.append('pdf', bookData.pdf);
-  }
+  Object.entries(bookData).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      if (value instanceof File) {
+        formData.append(key, value);
+      } else {
+        formData.append(key, String(value));
+      }
+    }
+  });
   
   const response = await AxiosConfig.post('/books', formData, {
     headers: {

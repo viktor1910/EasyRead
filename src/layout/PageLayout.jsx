@@ -84,7 +84,7 @@ const PageLayout = ({ children }) => {
   };
 
   const handleBookClick = (book) => {
-    navigate(`/book/${book.slug || book.id}`);
+    navigate(`/books/${book.id}`);
     setShowSearchResults(false);
     setSearchKeyword("");
   };
