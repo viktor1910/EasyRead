@@ -7,6 +7,7 @@ import NotFoundPage from "./pages/404Page";
 import CategoriesPage from "./pages/Categories";
 import ProtectedRoute from "./context/PermissionContext/ProtectedRoute";
 import BookDetail from "./pages/Book";
+import MotopartDetail from "./pages/Motopart";
 import AdminPage from "./pages/Admin";
 import AuthProtectedRoute from "./context/AuthContext/ProtectedRoute";
 import LoginPage from "./pages/Auth/LoginPage";
@@ -90,6 +91,22 @@ const AppRouter = () => (
         element={
           <PageLayout>
             <BookDetail />
+          </PageLayout>
+        }
+      />
+      <Route
+        path="/motopart/:slug"
+        element={
+          <PageLayout>
+            <MotopartDetail />
+          </PageLayout>
+        }
+      />
+      <Route
+        path="/motoparts/:id"
+        element={
+          <PageLayout>
+            <MotopartDetail />
           </PageLayout>
         }
       />

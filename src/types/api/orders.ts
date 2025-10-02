@@ -1,13 +1,13 @@
 import { BaseEntity } from './common';
-import { Book } from './books';
+import { Motopart } from './motoparts';
 import { User } from './auth';
 
 // Cart types
 export interface CartItem extends BaseEntity {
-  book_id: number;
+  motopart_id: number;
   user_id: number;
   quantity: number;
-  book?: Book;
+  motopart?: Motopart;
 }
 
 export interface Cart {
@@ -17,7 +17,7 @@ export interface Cart {
 }
 
 export interface AddToCartRequest {
-  book_id: number;
+  motopart_id: number;
   quantity: number;
 }
 
@@ -47,10 +47,10 @@ export interface Order extends BaseEntity {
 
 export interface OrderItem extends BaseEntity {
   order_id: number;
-  book_id: number;
+  motopart_id: number;
   quantity: number;
   price: number;
-  book?: Book;
+  motopart?: Motopart;
 }
 
 export interface CreateOrderRequest {

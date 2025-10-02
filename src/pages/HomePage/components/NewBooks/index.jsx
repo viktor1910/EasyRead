@@ -1,16 +1,18 @@
 import React from "react";
 import { Box, Stack, Typography } from "@mui/material";
-import BookItem from "../BookItem";
+import MotopartItem from "../MotopartItem";
 import Carousel from "../../../../components/Carousel";
-const NewBooks = () => {
+const NewMotoparts = () => {
   return (
     <Box>
       <Typography variant="h2" component="p" mb={2}>
-        New books on EasyRead:
+        New motoparts on EasyRead:
       </Typography>
-      <Carousel items={[<BookItem />, <BookItem />, <BookItem />]} />
+      <Carousel
+        items={[<MotopartItem />, <MotopartItem />, <MotopartItem />]}
+      />
     </Box>
   );
 };
 
-export default NewBooks;
+export default NewMotoparts;

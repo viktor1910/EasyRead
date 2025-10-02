@@ -14,8 +14,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
 import { useParams, useSearchParams } from "react-router";
 import { useGetCategories } from "../HomePage/components/Categories/hook";
-import { useGetBooks } from "../HomePage/components/AllProduct/hook";
-import BookItem from "../HomePage/components/BookItem";
+import { useMotoparts } from "../../services/motoparts";
+import MotopartItem from "../HomePage/components/MotopartItem";
 import { useNavigate } from "react-router";
 // Import centralized categories service instead of individual useCategory
 import { useCategories } from "../../services/categories/categoriesService";
@@ -45,9 +45,9 @@ const CategoriesPage = () => {
   }, [searchKeyword]);
 
   const { data: categories, isLoading: loadingCategories } = useGetCategories();
-  const { data: books, isLoading: loadingBooks } = useGetBooks({
+  const { data: motoparts, isLoading: loadingMotoparts } = useMotoparts({
     category_id: id,
-    keyword: debouncedSearchKeyword || undefined,
+    search: debouncedSearchKeyword || undefined,
   });
 
   // Get category detail when id is available
@@ -62,7 +62,7 @@ const CategoriesPage = () => {
     setSearchKeyword("");
   };
 
-  console.log("CategoriesPage books", books);
+  console.log("CategoriesPage motoparts", motoparts);
   return (
     <Box display={"flex"} gap={3} padding={4} minHeight="100vh">
       {/* Sidebar danh mục bên trái - fixed width */}
@@ -153,7 +153,7 @@ const CategoriesPage = () => {
               ? `Kết quả tìm kiếm cho "${searchKeyword}"`
               : "Tất cả sản phẩm"}
           </Typography>
-          {loadingBooks ? (
+          {loadingMotoparts ? (
             <Typography>Đang tải...</Typography>
           ) : (
             <Box
@@ -163,11 +163,15 @@ const CategoriesPage = () => {
                 gap: 2,
               }}
             >
-              {books && books.data && books.data.length > 0 ? (
-                books.data.map((book) => <BookItem key={book.id} book={book} />)
+              {motoparts && motoparts.data && motoparts.data.length > 0 ? (
+                motoparts.data.map((motopart) => (
+                  <MotopartItem key={motopart.id} motopart={motopart} />
+                ))
               ) : (
                 <Typography>
-                  {searchKeyword ? "Không tìm thấy sách nào" : "Không có sách"}
+                  {searchKeyword
+                    ? "Không tìm thấy phụ tùng nào"
+                    : "Không có phụ tùng"}
                 </Typography>
               )}
             </Box>

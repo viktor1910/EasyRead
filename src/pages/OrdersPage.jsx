@@ -171,7 +171,7 @@ const OrdersPage = () => {
           <Button
             variant="contained"
             size="large"
-            onClick={() => navigate("/books")}
+            onClick={() => navigate("/motoparts")}
             startIcon={<ShoppingBagIcon />}
           >
             Mua sắm ngay
@@ -432,8 +432,11 @@ const OrderDetailDialog = ({
                   <Box display="flex" gap={2}>
                     <Box
                       component="img"
-                      src={item.book?.image_full_url || "/placeholder-book.jpg"}
-                      alt={item.book?.title}
+                      src={
+                        item.motopart?.image_full_url ||
+                        "/placeholder-motopart.jpg"
+                      }
+                      alt={item.motopart?.name}
                       sx={{
                         width: 80,
                         height: 100,
@@ -443,21 +446,21 @@ const OrderDetailDialog = ({
                     />
                     <Box flex={1}>
                       <Typography variant="subtitle1" gutterBottom>
-                        {item.book?.title}
+                        {item.motopart?.name}
                       </Typography>
                       <Typography
                         variant="body2"
                         color="text.secondary"
                         gutterBottom
                       >
-                        Tác giả: {item.book?.author?.name}
+                        Nhà cung cấp: {item.motopart?.supplier}
                       </Typography>
                       <Typography
                         variant="body2"
                         color="text.secondary"
                         gutterBottom
                       >
-                        Thể loại: {item.book?.category?.name}
+                        Thể loại: {item.motopart?.category?.name}
                       </Typography>
                       <Box
                         display="flex"

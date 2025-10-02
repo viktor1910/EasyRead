@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Stack, Typography } from "@mui/material";
-import BookTopItem from "../BookItem/BookTopItem";
+import MotopartTopItem from "../MotopartItem/MotopartTopItem";
 import Carousel from "../../../../components/Carousel";
 const TopResearch = () => {
   return (
@@ -10,9 +10,9 @@ const TopResearch = () => {
       </Typography>
       <Carousel
         items={[
-          <BookTopItem top={1} />,
-          <BookTopItem top={2} />,
-          <BookTopItem top={3} />,
+          <MotopartTopItem top={1} />,
+          <MotopartTopItem top={2} />,
+          <MotopartTopItem top={3} />,
         ]}
       />
     </Box>

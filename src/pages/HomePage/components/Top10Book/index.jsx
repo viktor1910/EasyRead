@@ -1,17 +1,17 @@
 import React from "react";
 import { Box, Stack, Typography, CircularProgress } from "@mui/material";
-import BookItem from "../BookItem";
-import BookTopItem from "../BookItem/BookTopItem";
+import MotopartItem from "../MotopartItem";
+import MotopartTopItem from "../MotopartItem/MotopartTopItem";
 import Carousel from "../../../../components/Carousel";
-import { useMostOrderedBooksQuery } from "../../../../services/books/booksService";
+import { useMostOrderedMotopartsQuery } from "../../../../services/motoparts/motopartsService";
 
-const Top10Book = () => {
+const Top10Motopart = () => {
   const {
-    data: mostOrderedBooks,
+    data: mostOrderedMotoparts,
     isLoading,
     isError,
     error,
-  } = useMostOrderedBooksQuery();
+  } = useMostOrderedMotopartsQuery();
 
   if (isLoading) {
     return (
@@ -30,28 +30,32 @@ const Top10Book = () => {
     return (
       <Box>
         <Typography variant="h2" component="p" mb={2}>
-          Top 10 sách bán chạy nhất:
+          Top 10 phụ tùng bán chạy nhất:
         </Typography>
         <Typography variant="body1" color="error">
-          Không thể tải dữ liệu sách bán chạy. Vui lòng thử lại sau.
+          Không thể tải dữ liệu phụ tùng bán chạy. Vui lòng thử lại sau.
         </Typography>
       </Box>
     );
   }
 
-  const books = mostOrderedBooks || [];
-  const topBooks = books.slice(0, 10); // Ensure we only get top 10
+  const motoparts = mostOrderedMotoparts || [];
+  const topMotoparts = motoparts.slice(0, 10); // Ensure we only get top 10
 
   return (
     <Box>
       <Typography variant="h2" component="p" mb={2}>
-        Top 10 sách bán chạy nhất:
+        Top 10 phụ tùng bán chạy nhất:
       </Typography>
 
       <Carousel
         items={
-          topBooks?.map((book, index) => (
-            <BookTopItem key={book.id} top={index + 1} book={book} />
+          topMotoparts?.map((motopart, index) => (
+            <MotopartTopItem
+              key={motopart.id}
+              top={index + 1}
+              motopart={motopart}
+            />
           )) || []
         }
       />
@@ -59,4 +63,4 @@ const Top10Book = () => {
   );
 };
 
-export default Top10Book;
+export default Top10Motopart;

@@ -174,8 +174,10 @@ const CartPage = () => {
                 <Box sx={{ flex: "0 0 120px", minWidth: 120 }}>
                   <Box
                     component="img"
-                    src={item.book?.image_full_url || "/placeholder-book.jpg"}
-                    alt={item.book?.title}
+                    src={
+                      item.motopart?.image_url || "/placeholder-motopart.jpg"
+                    }
+                    alt={item.motopart?.name}
                     sx={{
                       width: "100%",
                       height: 120,
@@ -193,21 +195,21 @@ const CartPage = () => {
                     gutterBottom
                     sx={{ fontSize: "1.1rem", lineHeight: 1.3 }}
                   >
-                    {item.book?.title}
+                    {item.motopart?.name}
                   </Typography>
                   <Typography
                     variant="body2"
                     color="text.secondary"
                     gutterBottom
                   >
-                    Tác giả: {item.book?.author?.name}
+                    Nhà cung cấp: {item.motopart?.supplier}
                   </Typography>
                   <Typography
                     variant="body2"
                     color="text.secondary"
                     gutterBottom
                   >
-                    Thể loại: {item.book?.category?.name}
+                    Thể loại: {item.motopart?.category?.name}
                   </Typography>
                   <Typography
                     variant="h6"
@@ -527,7 +529,7 @@ const CheckoutDialog = ({ open, onClose, cart, onSuccess }) => {
                     sx={{ mb: 1 }}
                   >
                     <Typography variant="body2">
-                      {item.book?.title} x {item.quantity}
+                      {item.motopart?.name} x {item.quantity}
                     </Typography>
                     <Typography variant="body2">
                       {formatPrice(item.total)}

@@ -109,9 +109,10 @@ const CartIcon = () => {
                       <Box
                         component="img"
                         src={
-                          item.book?.image_full_url || "/placeholder-book.jpg"
+                          item.motopart?.image_full_url ||
+                          "/placeholder-motopart.jpg"
                         }
-                        alt={item.book?.title}
+                        alt={item.motopart?.name}
                         sx={{
                           width: 50,
                           height: 60,
@@ -122,7 +123,7 @@ const CartIcon = () => {
 
                       <Box flex={1}>
                         <Typography variant="subtitle2" gutterBottom>
-                          {item.book?.title}
+                          {item.motopart?.name}
                         </Typography>
 
                         <Typography

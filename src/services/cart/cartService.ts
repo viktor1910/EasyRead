@@ -31,7 +31,7 @@ const getCartItems = async (cartId: string): Promise<CartItem[]> => {
 
 const addToCart = async (cartId: string, data: AddToCartRequest): Promise<CartItem> => {
   const response = await AxiosConfig.post(`/cartitems/cart/${cartId}/add/`, {
-    motopart_id: data.book_id, // API uses motopart_id instead of book_id
+    motopart_id: data.motopart_id, // Using motopart_id consistently
     quantity: data.quantity,
   });
   return response.data;
@@ -234,8 +234,8 @@ export const useAddToCartMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ bookId, quantity = 1 }: { bookId: number; quantity?: number }) =>
-      legacyCartAPI.add(bookId.toString(), quantity),
+    mutationFn: ({ motopartId, quantity = 1 }: { motopartId: number; quantity?: number }) =>
+      legacyCartAPI.add(motopartId.toString(), quantity),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
     },

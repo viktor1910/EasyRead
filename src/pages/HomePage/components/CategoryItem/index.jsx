@@ -26,7 +26,7 @@ const CategoryItem = ({ category }) => {
             category?.image_url ||
             "https://contenthub-static.grammarly.com/blog/wp-content/uploads/2022/06/Memoir-vs.-Autobiography-437x233.jpg"
           }
-          alt={category?.name || "Book Cover"}
+          alt={category?.name || "Motopart Category"}
           style={{
             width: "100%",
             height: "100%",
@@ -49,7 +49,7 @@ const CategoryItem = ({ category }) => {
             textShadow: "-4px 1px 6px rgba(0,0,0,0.58)",
           }}
         >
-          300 books
+          300 motoparts
         </Typography>
       </Box>
     </Box>

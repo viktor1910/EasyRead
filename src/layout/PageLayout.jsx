@@ -84,7 +84,7 @@ const PageLayout = ({ children }) => {
   };
 
   const handleBookClick = (book) => {
-    navigate(`/books/${book.id}`);
+    navigate(`/motoparts/${book.id}`);
     setShowSearchResults(false);
     setSearchKeyword("");
   };

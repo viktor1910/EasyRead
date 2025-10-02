@@ -14,25 +14,23 @@ import {
   Number10,
 } from "../../../../components/Icon/Top10Number";
 
-const BookTopItem = ({ top, book }) => {
+const MotopartTopItem = ({ top, motopart }) => {
   const [hovered, setHovered] = useState(false);
   const navigate = useNavigate();
 
-  // Default fallback data when no book is provided
-  const bookTitle = book?.title || "Book Title";
-  // Handle author as either a string or an object with name property
-  const bookAuthor =
-    typeof book?.author === "string"
-      ? book.author
-      : book?.author?.name || "Author Name";
-  const bookImage =
-    book?.image_full_url ||
+  // Default fallback data when no motopart is provided
+  const motopartName = motopart?.name || "Motopart Name";
+  // Handle supplier as string
+  const motopartSupplier = motopart?.supplier || "Supplier Name";
+  const motopartImage =
+    motopart?.image_full_url ||
+    motopart?.image_url ||
     "https://salt.tikicdn.com/cache/750x750/ts/product/e2/9e/ed/e1dbece01b595a871eadb52369e3b20c.jpg.webp";
 
-  console.log("BookTopItem book", book);
+  console.log("MotopartTopItem motopart", motopart);
   const handleClick = () => {
-    if (book?.id) {
-      navigate(`/motoparts/${book.id}`);
+    if (motopart?.id) {
+      navigate(`/motoparts/${motopart.id}`);
     }
   };
 
@@ -95,8 +93,8 @@ const BookTopItem = ({ top, book }) => {
             mb={1}
           >
             <img
-              src={bookImage}
-              alt={`${bookTitle} cover`}
+              src={motopartImage}
+              alt={`${motopartName} image`}
               style={{
                 width: "100%",
                 height: "100%",
@@ -112,4 +110,4 @@ const BookTopItem = ({ top, book }) => {
   );
 };
 
-export default BookTopItem;
+export default MotopartTopItem;

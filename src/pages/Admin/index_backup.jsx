@@ -1,5 +1,11 @@
-import React from "react";
-import { Box, Typography } from "@mui/material";
+import React from "react";      <Routes>
+        <Route path="/" element={<AdminDashboard />} />
+        <Route path="/books" element={<BookManagement />} />
+        <Route path="/motoparts" element={<MotopartManagement />} />
+        <Route path="/categories" element={<CategoryManagement />} />
+        <Route path="/shipping" element={<ShippingManagement />} />
+        <Route path="/accounts" element={<AccountManagement />} />
+      </Routes> { Box, Typography } from "@mui/material";
 import AdminLayout from "./components/AdminLayout";
 import { Routes, Route } from "react-router";
 import BookManagement from "./Books";
@@ -28,13 +34,11 @@ const AdminPage = () => {
       <Routes>
         <Route path="/" element={<AdminDashboard />} />
         <Route path="/books" element={<BookManagement />} />
-        <Route path="/motoparts" element={<MotopartManagement />} />
         <Route path="/categories" element={<CategoryManagement />} />
         <Route path="/shipping" element={<ShippingManagement />} />
-        <Route path="/accounts" element={<AccountManagement />} />
+        <Route path="/account" element={<AccountManagement />} />
       </Routes>
     </AdminLayout>
   );
 };
-
 export default AdminPage;

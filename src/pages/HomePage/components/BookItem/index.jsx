@@ -49,7 +49,7 @@ const BookItem = ({ book }) => {
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onClick={() => navigate(`/books/${book.id}`)}
+      onClick={() => navigate(`/motoparts/${book.id}`)}
     >
       <Box
         sx={{

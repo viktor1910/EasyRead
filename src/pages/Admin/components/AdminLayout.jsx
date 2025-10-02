@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { useNavigate, useLocation } from "react-router";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
+import BuildIcon from "@mui/icons-material/Build";
 import CategoryIcon from "@mui/icons-material/Category";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -22,6 +23,7 @@ const AdminLayout = ({ children }) => {
 
   const menuItems = [
     { text: "Quản lý sách", icon: <LibraryBooksIcon />, path: "/admin/books" },
+    { text: "Quản lý phụ tùng", icon: <BuildIcon />, path: "/admin/motoparts" },
     {
       text: "Quản lý danh mục",
       icon: <CategoryIcon />,
@@ -35,7 +37,7 @@ const AdminLayout = ({ children }) => {
     {
       text: "Quản lý tài khoản",
       icon: <AccountCircleIcon />,
-      path: "/admin/account",
+      path: "/admin/accounts",
     },
   ];
 
