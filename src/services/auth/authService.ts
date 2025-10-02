@@ -5,41 +5,41 @@ import { AuthResponse, LoginRequest, RegisterRequest, User } from '../../types/a
 
 // API functions using AxiosConfig (preferred)
 const login = async (email: string, password: string): Promise<AuthResponse> => {
-  const response = await AxiosConfig.post('/login', { email, password });
+  const response = await AxiosConfig.post('/users/login/', { email, password });
   return response.data;
 };
 
 const register = async (data: RegisterRequest): Promise<AuthResponse> => {
-  const response = await AxiosConfig.post('/register', data);
+  const response = await AxiosConfig.post('/users/register/', data);
   return response.data;
 };
 
 const logout = async (): Promise<void> => {
-  await AxiosConfig.post('/logout');
+  await AxiosConfig.post('/users/logout/');
 };
 
 const getCurrentUser = async (): Promise<User> => {
-  const response = await AxiosConfig.get('/user');
+  const response = await AxiosConfig.get('/users/me/');
   return response.data;
 };
 
 // Legacy API functions using fetch (for backward compatibility)
 const legacyAuthAPI = {
   login: (email: string, password: string) =>
-    apiRequest('/login', {
+    apiRequest('/users/login/', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     }),
   register: (data: any) =>
-    apiRequest('/register', {
+    apiRequest('/users/register/', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
   logout: () =>
-    apiRequest('/logout', {
+    apiRequest('/users/logout/', {
       method: 'POST',
     }),
-  getCurrentUser: () => apiRequest('/user'),
+  getCurrentUser: () => apiRequest('/users/me/'),
 };
 
 // React Query hooks

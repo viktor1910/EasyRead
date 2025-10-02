@@ -2,8 +2,10 @@ import { BaseEntity } from './common';
 
 // Auth types
 export interface User extends BaseEntity {
-  name: string;
+  username: string;
   email: string;
+  first_name: string;
+  last_name: string;
   role: 'admin' | 'user';
   email_verified_at?: string;
 }
@@ -19,8 +21,10 @@ export interface LoginRequest {
 }
 
 export interface RegisterRequest {
-  name: string;
+  username: string;
   email: string;
   password: string;
-  password_confirmation: string;
+  first_name: string;
+  last_name: string;
+  role?: 'admin' | 'user';
 }

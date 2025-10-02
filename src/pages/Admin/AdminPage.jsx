@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext/AuthContext';
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../../context/AuthContext/AuthContext";
 import {
   Container,
   Typography,
@@ -23,48 +23,48 @@ import {
   DialogActions,
   TextField,
   Alert,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   Visibility as ViewIcon,
-} from '@mui/icons-material';
+} from "@mui/icons-material";
 
 const AdminPage = () => {
   const { getAuthHeaders } = useAuth();
   const [products, setProducts] = useState([]);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [formData, setFormData] = useState({
-    title: '',
-    author: '',
-    description: '',
-    price: '',
-    stock: '',
-    publication_year: '',
+    title: "",
+    author: "",
+    description: "",
+    price: "",
+    stock: "",
+    publication_year: "",
   });
 
   // Fetch products
   const fetchProducts = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/products', {
+      const response = await fetch("http://localhost:8000/api/products", {
         headers: getAuthHeaders(),
       });
       if (response.ok) {
         const data = await response.json();
         setProducts(data.data || data);
       } else if (response.status === 401) {
-        setError('Bạn cần đăng nhập để xem sản phẩm');
+        setError("Bạn cần đăng nhập để xem sản phẩm");
       } else if (response.status === 403) {
-        setError('Bạn không có quyền truy cập');
+        setError("Bạn không có quyền truy cập");
       }
     } catch (error) {
-      console.error('Error fetching products:', error);
-      setError('Có lỗi xảy ra khi tải sản phẩm');
+      console.error("Error fetching products:", error);
+      setError("Có lỗi xảy ra khi tải sản phẩm");
     }
   };
 
@@ -72,9 +72,9 @@ const AdminPage = () => {
   const fetchUsers = async () => {
     // Mock user data - in real app, you'd have an API endpoint for this
     setUsers([
-      { id: 1, name: 'Admin User', email: 'admin@test.com', role: 'admin' },
-      { id: 2, name: 'John Doe', email: 'john@example.com', role: 'user' },
-      { id: 3, name: 'Jane Smith', email: 'jane@example.com', role: 'user' },
+      { id: 1, name: "Admin User", email: "admin@test.com", role: "admin" },
+      { id: 2, name: "John Doe", email: "john@example.com", role: "user" },
+      { id: 3, name: "Jane Smith", email: "jane@example.com", role: "user" },
     ]);
   };
 
@@ -91,21 +91,21 @@ const AdminPage = () => {
     setSelectedProduct(product);
     if (product) {
       setFormData({
-        title: product.title || '',
-        author: product.author || '',
-        description: product.description || '',
-        price: product.price || '',
-        stock: product.stock || '',
-        publication_year: product.publication_year || '',
+        title: product.title || "",
+        author: product.author || "",
+        description: product.description || "",
+        price: product.price || "",
+        stock: product.stock || "",
+        publication_year: product.publication_year || "",
       });
     } else {
       setFormData({
-        title: '',
-        author: '',
-        description: '',
-        price: '',
-        stock: '',
-        publication_year: '',
+        title: "",
+        author: "",
+        description: "",
+        price: "",
+        stock: "",
+        publication_year: "",
       });
     }
     setOpenDialog(true);
@@ -115,23 +115,23 @@ const AdminPage = () => {
     setOpenDialog(false);
     setSelectedProduct(null);
     setFormData({
-      title: '',
-      author: '',
-      description: '',
-      price: '',
-      stock: '',
-      publication_year: '',
+      title: "",
+      author: "",
+      description: "",
+      price: "",
+      stock: "",
+      publication_year: "",
     });
   };
 
   const handleSubmit = async () => {
     try {
-      const url = selectedProduct 
+      const url = selectedProduct
         ? `http://localhost:8000/api/products/${selectedProduct.id}`
-        : 'http://localhost:8000/api/products';
-      
-      const method = selectedProduct ? 'PUT' : 'POST';
-      
+        : "http://localhost:8000/api/products";
+
+      const method = selectedProduct ? "PUT" : "POST";
+
       const response = await fetch(url, {
         method,
         headers: getAuthHeaders(),
@@ -142,28 +142,31 @@ const AdminPage = () => {
         await fetchProducts();
         handleCloseDialog();
       } else {
-        setError('Có lỗi xảy ra khi lưu sản phẩm');
+        setError("Có lỗi xảy ra khi lưu sản phẩm");
       }
     } catch (error) {
-      setError('Có lỗi xảy ra khi lưu sản phẩm');
+      setError("Có lỗi xảy ra khi lưu sản phẩm");
     }
   };
 
   const handleDelete = async (productId) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
+    if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
       try {
-        const response = await fetch(`http://localhost:8000/api/products/${productId}`, {
-          method: 'DELETE',
-          headers: getAuthHeaders(),
-        });
+        const response = await fetch(
+          `http://localhost:8000/api/products/${productId}`,
+          {
+            method: "DELETE",
+            headers: getAuthHeaders(),
+          }
+        );
 
         if (response.ok) {
           await fetchProducts();
         } else {
-          setError('Có lỗi xảy ra khi xóa sản phẩm');
+          setError("Có lỗi xảy ra khi xóa sản phẩm");
         }
       } catch (error) {
-        setError('Có lỗi xảy ra khi xóa sản phẩm');
+        setError("Có lỗi xảy ra khi xóa sản phẩm");
       }
     }
   };
@@ -171,7 +174,12 @@ const AdminPage = () => {
   if (loading) {
     return (
       <Container>
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="50vh"
+        >
           <Typography>Đang tải...</Typography>
         </Box>
       </Container>
@@ -185,7 +193,7 @@ const AdminPage = () => {
       </Typography>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
+        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError("")}>
           {error}
         </Alert>
       )}
@@ -198,9 +206,7 @@ const AdminPage = () => {
               <Typography color="textSecondary" gutterBottom>
                 Tổng sản phẩm
               </Typography>
-              <Typography variant="h4">
-                {products.length}
-              </Typography>
+              <Typography variant="h4">{products.length}</Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -210,9 +216,7 @@ const AdminPage = () => {
               <Typography color="textSecondary" gutterBottom>
                 Tổng người dùng
               </Typography>
-              <Typography variant="h4">
-                {users.length}
-              </Typography>
+              <Typography variant="h4">{users.length}</Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -223,7 +227,7 @@ const AdminPage = () => {
                 Admin
               </Typography>
               <Typography variant="h4">
-                {users.filter(user => user.role === 'admin').length}
+                {users.filter((user) => user.role === "admin").length}
               </Typography>
             </CardContent>
           </Card>
@@ -235,7 +239,7 @@ const AdminPage = () => {
                 User
               </Typography>
               <Typography variant="h4">
-                {users.filter(user => user.role === 'user').length}
+                {users.filter((user) => user.role === "user").length}
               </Typography>
             </CardContent>
           </Card>
@@ -245,7 +249,12 @@ const AdminPage = () => {
         <Grid item xs={12}>
           <Card>
             <CardContent>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                mb={2}
+              >
                 <Typography variant="h6">Quản lý sản phẩm</Typography>
                 <Button
                   variant="contained"
@@ -255,7 +264,7 @@ const AdminPage = () => {
                   Thêm sản phẩm
                 </Button>
               </Box>
-              
+
               <TableContainer component={Paper}>
                 <Table>
                   <TableHead>
@@ -309,7 +318,7 @@ const AdminPage = () => {
               <Typography variant="h6" gutterBottom>
                 Quản lý người dùng
               </Typography>
-              
+
               <TableContainer component={Paper}>
                 <Table>
                   <TableHead>
@@ -325,12 +334,14 @@ const AdminPage = () => {
                     {users.map((user) => (
                       <TableRow key={user.id}>
                         <TableCell>{user.id}</TableCell>
-                        <TableCell>{user.name}</TableCell>
+                        <TableCell>{user.username}</TableCell>
                         <TableCell>{user.email}</TableCell>
                         <TableCell>
                           <Chip
                             label={user.role}
-                            color={user.role === 'admin' ? 'primary' : 'default'}
+                            color={
+                              user.role === "admin" ? "primary" : "default"
+                            }
                             size="small"
                           />
                         </TableCell>
@@ -353,9 +364,14 @@ const AdminPage = () => {
       </Grid>
 
       {/* Product Form Dialog */}
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>
-          {selectedProduct ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới'}
+          {selectedProduct ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm mới"}
         </DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 1 }}>
@@ -363,21 +379,27 @@ const AdminPage = () => {
               fullWidth
               label="Tiêu đề"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
               margin="normal"
             />
             <TextField
               fullWidth
               label="Tác giả"
               value={formData.author}
-              onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, author: e.target.value })
+              }
               margin="normal"
             />
             <TextField
               fullWidth
               label="Mô tả"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
               margin="normal"
               multiline
               rows={3}
@@ -387,7 +409,9 @@ const AdminPage = () => {
               label="Giá"
               type="number"
               value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, price: e.target.value })
+              }
               margin="normal"
             />
             <TextField
@@ -395,7 +419,9 @@ const AdminPage = () => {
               label="Tồn kho"
               type="number"
               value={formData.stock}
-              onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, stock: e.target.value })
+              }
               margin="normal"
             />
             <TextField
@@ -403,7 +429,9 @@ const AdminPage = () => {
               label="Năm xuất bản"
               type="number"
               value={formData.publication_year}
-              onChange={(e) => setFormData({ ...formData, publication_year: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, publication_year: e.target.value })
+              }
               margin="normal"
             />
           </Box>
@@ -411,7 +439,7 @@ const AdminPage = () => {
         <DialogActions>
           <Button onClick={handleCloseDialog}>Hủy</Button>
           <Button onClick={handleSubmit} variant="contained">
-            {selectedProduct ? 'Cập nhật' : 'Thêm'}
+            {selectedProduct ? "Cập nhật" : "Thêm"}
           </Button>
         </DialogActions>
       </Dialog>

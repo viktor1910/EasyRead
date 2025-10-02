@@ -15,7 +15,9 @@ import { useNavigate, Link as RouterLink } from "react-router";
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
-    name: "",
+    username: "",
+    firstName: "",
+    lastName: "",
     email: "",
     password: "",
     confirmedPassword: "",
@@ -47,10 +49,11 @@ const RegisterPage = () => {
     }
 
     const result = await register(
-      formData.name,
+      formData.username,
       formData.email,
       formData.password,
-      formData.confirmedPassword
+      formData.firstName,
+      formData.lastName
     );
 
     if (result.success) {
@@ -108,12 +111,36 @@ const RegisterPage = () => {
               margin="normal"
               required
               fullWidth
-              id="name"
-              label="Họ và tên"
-              name="name"
-              autoComplete="name"
+              id="username"
+              label="Tên đăng nhập"
+              name="username"
+              autoComplete="username"
               autoFocus
-              value={formData.name}
+              value={formData.username}
+              onChange={handleChange}
+              disabled={loading}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="firstName"
+              label="Tên"
+              name="firstName"
+              autoComplete="given-name"
+              value={formData.firstName}
+              onChange={handleChange}
+              disabled={loading}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="lastName"
+              label="Họ"
+              name="lastName"
+              autoComplete="family-name"
+              value={formData.lastName}
               onChange={handleChange}
               disabled={loading}
             />

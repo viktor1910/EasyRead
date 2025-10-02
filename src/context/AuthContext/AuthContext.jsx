@@ -36,8 +36,10 @@ export const AuthProvider = ({ children }) => {
       if (response.user && response.token) {
         const userData = {
           id: response.user.id,
-          name: response.user.name,
+          username: response.user.username,
           email: response.user.email,
+          first_name: response.user.first_name,
+          last_name: response.user.last_name,
           role: response.user.role,
         };
 
@@ -60,21 +62,25 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (name, email, password, confirmedPassword) => {
+  const register = async (username, email, password, firstName, lastName) => {
     try {
-      const response = await authAPI.register(
-        name,
+      const response = await authAPI.register({
+        username,
         email,
         password,
-        confirmedPassword
-      );
+        first_name: firstName,
+        last_name: lastName,
+        role: "user",
+      });
 
       // Backend trả về { message, user, token }
       if (response.user && response.token) {
         const userData = {
           id: response.user.id,
-          name: response.user.name,
+          username: response.user.username,
           email: response.user.email,
+          first_name: response.user.first_name,
+          last_name: response.user.last_name,
           role: response.user.role,
         };
 
