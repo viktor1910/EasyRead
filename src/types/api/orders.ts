@@ -26,6 +26,12 @@ export interface UpdateCartItemRequest {
   quantity: number;
 }
 
+// Checkout types
+export interface CheckoutRequest {
+  shipping_address: string;
+  payment_method: string;
+}
+
 // Order types
 export interface Order extends BaseEntity {
   user_id: number;
