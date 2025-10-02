@@ -70,7 +70,7 @@ export interface CreateCategoryRequest {
   name: string;
   slug: string;
   description?: string;
-  image?: File;
+  image?: string; // URL string instead of File
 }
 
 export interface UpdateCategoryRequest extends Partial<CreateCategoryRequest> {

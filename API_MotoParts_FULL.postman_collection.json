@@ -1,0 +1,1442 @@
+{
+	"info": {
+		"_postman_id": "c9e4b6a7-8d1b-4e5e-9a3c-2f1e0d8b7c6a",
+		"name": "MotoParts Complete API Collection",
+		"description": "Complete API collection for MotoParts Django REST API project with all endpoints, authentication, and test data",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39816161"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "User Registration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"testuser@example.com\",\n    \"password\": \"securepassword123\",\n    \"first_name\": \"Test\",\n    \"last_name\": \"User\",\n    \"role\": \"user\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/register/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"register",
+								""
+							]
+						},
+						"description": "Register a new user account"
+					},
+					"response": []
+				},
+				{
+					"name": "User Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const responseJson = pm.response.json();",
+									"    pm.collectionVariables.set('auth_token', responseJson.token);",
+									"    pm.collectionVariables.set('user_id', responseJson.user.id);",
+									"    console.log('Token saved:', responseJson.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"testuser@example.com\",\n    \"password\": \"securepassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/login/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"login",
+								""
+							]
+						},
+						"description": "Login user and get authentication token"
+					},
+					"response": []
+				},
+				{
+					"name": "User Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/logout/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"logout",
+								""
+							]
+						},
+						"description": "Logout current user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users (Admin Only)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								""
+							]
+						},
+						"description": "Get list of all users (Admin access required)"
+					},
+					"response": []
+				}
+			],
+			"description": "User authentication and management endpoints"
+		},
+		{
+			"name": "Categories",
+			"item": [
+				{
+					"name": "Get All Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/categories/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories",
+								""
+							]
+						},
+						"description": "Get list of all motorcycle part categories"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Category",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Engine Parts\",\n    \"slug\": \"engine-parts\",\n    \"image\": \"https://example.com/engine-parts.jpg\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/categories/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories",
+								""
+							]
+						},
+						"description": "Create a new category"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Category by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/categories/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories",
+								"1",
+								""
+							]
+						},
+						"description": "Get specific category by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Category",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Engine Parts\",\n    \"slug\": \"updated-engine-parts\",\n    \"image\": \"https://example.com/updated-engine-parts.jpg\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/categories/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories",
+								"1",
+								""
+							]
+						},
+						"description": "Update existing category"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Category",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/categories/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories",
+								"1",
+								""
+							]
+						},
+						"description": "Delete a category"
+					},
+					"response": []
+				}
+			],
+			"description": "Category management endpoints"
+		},
+		{
+			"name": "Moto Parts",
+			"item": [
+				{
+					"name": "Get All Moto Parts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/motoparts/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"motoparts",
+								""
+							]
+						},
+						"description": "Get list of all motorcycle parts"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Moto Part",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Yamaha R1 Engine Piston\",\n    \"slug\": \"yamaha-r1-engine-piston\",\n    \"price\": 299.99,\n    \"discount\": 10.0,\n    \"stock\": 50,\n    \"status\": \"active\",\n    \"description\": \"High-performance piston for Yamaha R1 motorcycle engine\",\n    \"image_url\": \"https://example.com/yamaha-r1-piston.jpg\",\n    \"category\": 1,\n    \"manufacture_year\": 2023,\n    \"supplier\": \"Yamaha Motors\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/motoparts/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"motoparts",
+								""
+							]
+						},
+						"description": "Create a new motorcycle part"
+					},
+					"response": []
+				}
+			],
+			"description": "Motorcycle parts management endpoints"
+		},
+		{
+			"name": "Shopping Carts",
+			"item": [
+				{
+					"name": "Get User Carts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/carts/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"carts",
+								""
+							]
+						},
+						"description": "Get all carts for current user"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const responseJson = pm.response.json();",
+									"    pm.collectionVariables.set('cart_id', responseJson.id);",
+									"    console.log('Cart ID saved:', responseJson.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"active\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/carts/create/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"carts",
+								"create",
+								""
+							]
+						},
+						"description": "Create a new cart for user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Active Cart",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/carts/active/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"carts",
+								"active",
+								""
+							]
+						},
+						"description": "Get user's active cart"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cart by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/carts/{{cart_id}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"carts",
+								"{{cart_id}}",
+								""
+							]
+						},
+						"description": "Get specific cart by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Checkout Cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const responseJson = pm.response.json();",
+									"    if (responseJson.order && responseJson.order.id) {",
+									"        pm.collectionVariables.set('order_id', responseJson.order.id);",
+									"        console.log('Order ID saved:', responseJson.order.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"shipping_address\": \"123 Main Street, Ho Chi Minh City, Vietnam\",\n    \"payment_method\": \"credit_card\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/carts/{{cart_id}}/checkout/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"carts",
+								"{{cart_id}}",
+								"checkout",
+								""
+							]
+						},
+						"description": "Checkout cart and create order"
+					},
+					"response": []
+				}
+			],
+			"description": "Shopping cart management endpoints"
+		},
+		{
+			"name": "Cart Items",
+			"item": [
+				{
+					"name": "Get Cart Items",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/cartitems/cart/{{cart_id}}/items/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cartitems",
+								"cart",
+								"{{cart_id}}",
+								"items",
+								""
+							]
+						},
+						"description": "Get all items in a specific cart"
+					},
+					"response": []
+				},
+				{
+					"name": "Add Item to Cart",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"motopart_id\": 1,\n    \"quantity\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/cartitems/cart/{{cart_id}}/add/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cartitems",
+								"cart",
+								"{{cart_id}}",
+								"add",
+								""
+							]
+						},
+						"description": "Add a moto part to cart"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Cart Item",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"motopart_id\": 1,\n    \"quantity\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/cartitems/cart/{{cart_id}}/items/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cartitems",
+								"cart",
+								"{{cart_id}}",
+								"items",
+								""
+							]
+						},
+						"description": "Create new cart item"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Cart Item Quantity",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": 3\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/cartitems/cart/{{cart_id}}/items/1/update/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cartitems",
+								"cart",
+								"{{cart_id}}",
+								"items",
+								"1",
+								"update",
+								""
+							]
+						},
+						"description": "Update quantity of specific cart item"
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Item from Cart",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/cartitems/cart/{{cart_id}}/items/1/remove/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cartitems",
+								"cart",
+								"{{cart_id}}",
+								"items",
+								"1",
+								"remove",
+								""
+							]
+						},
+						"description": "Remove specific item from cart"
+					},
+					"response": []
+				},
+				{
+					"name": "Clear Cart",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/cartitems/cart/{{cart_id}}/clear/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cartitems",
+								"cart",
+								"{{cart_id}}",
+								"clear",
+								""
+							]
+						},
+						"description": "Remove all items from cart"
+					},
+					"response": []
+				}
+			],
+			"description": "Cart item management endpoints"
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "Get All Orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/orders/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders",
+								""
+							]
+						},
+						"description": "Get all orders for current user"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"shipping_address\": \"456 Nguyen Hue, District 1, Ho Chi Minh City\",\n    \"payment_method\": \"paypal\",\n    \"status\": \"pending\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/orders/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders",
+								""
+							]
+						},
+						"description": "Create a new order"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/orders/{{order_id}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders",
+								"{{order_id}}",
+								""
+							]
+						},
+						"description": "Get specific order by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/orders/me/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders",
+								"me",
+								""
+							]
+						},
+						"description": "Get orders for current user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Orders Admin View",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/orders/admin/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders",
+								"admin",
+								""
+							]
+						},
+						"description": "Get all orders (Admin view)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Order Status",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"shipped\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/orders/{{order_id}}/status/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders",
+								"{{order_id}}",
+								"status",
+								""
+							]
+						},
+						"description": "Update order status"
+					},
+					"response": []
+				}
+			],
+			"description": "Order management endpoints"
+		},
+		{
+			"name": "Order Items",
+			"item": [
+				{
+					"name": "Get All Order Items",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/orderitems/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orderitems",
+								""
+							]
+						},
+						"description": "Get all order items"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Order Item",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"order_id\": \"{{order_id}}\",\n    \"motopart_id\": 1,\n    \"quantity\": 2,\n    \"price\": 299.99\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/orderitems/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orderitems",
+								""
+							]
+						},
+						"description": "Create a new order item"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order Item by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/orderitems/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orderitems",
+								"1",
+								""
+							]
+						},
+						"description": "Get specific order item by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order Items by Order",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/orderitems/order/{{order_id}}/items/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orderitems",
+								"order",
+								"{{order_id}}",
+								"items",
+								""
+							]
+						},
+						"description": "Get all items for a specific order"
+					},
+					"response": []
+				},
+				{
+					"name": "Add Item to Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"motopart_id\": 1,\n    \"quantity\": 1,\n    \"price\": 299.99\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/orderitems/order/{{order_id}}/add/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orderitems",
+								"order",
+								"{{order_id}}",
+								"add",
+								""
+							]
+						},
+						"description": "Add item to specific order"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Order Item Quantity",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": 3\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/orderitems/1/update-quantity/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orderitems",
+								"1",
+								"update-quantity",
+								""
+							]
+						},
+						"description": "Update quantity of order item"
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Item from Order",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/orderitems/1/remove/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orderitems",
+								"1",
+								"remove",
+								""
+							]
+						},
+						"description": "Remove item from order"
+					},
+					"response": []
+				},
+				{
+					"name": "Clear Order Items",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/orderitems/order/{{order_id}}/clear/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orderitems",
+								"order",
+								"{{order_id}}",
+								"clear",
+								""
+							]
+						},
+						"description": "Clear all items from order"
+					},
+					"response": []
+				}
+			],
+			"description": "Order item management endpoints"
+		},
+		{
+			"name": "Transactions",
+			"item": [
+				{
+					"name": "Get All Transactions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/transactions/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"transactions",
+								""
+							]
+						},
+						"description": "Get all transactions"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Transaction",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"order_id\": \"{{order_id}}\",\n    \"amount\": 599.98,\n    \"payment_method\": \"credit_card\",\n    \"status\": \"pending\",\n    \"transaction_id\": \"TXN123456789\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/transactions/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"transactions",
+								""
+							]
+						},
+						"description": "Create a new transaction"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Transaction by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/transactions/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"transactions",
+								"1",
+								""
+							]
+						},
+						"description": "Get specific transaction by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Transactions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/transactions/user/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"transactions",
+								"user",
+								""
+							]
+						},
+						"description": "Get transactions for current user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Transaction Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/transactions/stats/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"transactions",
+								"stats",
+								""
+							]
+						},
+						"description": "Get transaction statistics"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Transactions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/transactions/search/?status=completed&payment_method=credit_card",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"transactions",
+								"search",
+								""
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "completed"
+								},
+								{
+									"key": "payment_method",
+									"value": "credit_card"
+								}
+							]
+						},
+						"description": "Search transactions with filters"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Transaction by Transaction ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/transactions/by-id/TXN123456789/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"transactions",
+								"by-id",
+								"TXN123456789",
+								""
+							]
+						},
+						"description": "Get transaction by transaction ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Transaction Status",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"completed\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/transactions/by-id/TXN123456789/status/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"transactions",
+								"by-id",
+								"TXN123456789",
+								"status",
+								""
+							]
+						},
+						"description": "Update transaction status by transaction ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Process Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"order_id\": \"{{order_id}}\",\n    \"payment_method\": \"credit_card\",\n    \"amount\": 599.98,\n    \"card_number\": \"4111111111111111\",\n    \"card_expiry\": \"12/25\",\n    \"card_cvv\": \"123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/transactions/process-payment/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"transactions",
+								"process-payment",
+								""
+							]
+						},
+						"description": "Process payment for order"
+					},
+					"response": []
+				}
+			],
+			"description": "Transaction and payment processing endpoints"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "cart_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "order_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

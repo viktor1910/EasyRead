@@ -5,80 +5,62 @@ import { Category, CreateCategoryRequest, UpdateCategoryRequest } from '../../ty
 
 // API functions using AxiosConfig (preferred)
 const getCategories = async (): Promise<Category[]> => {
-  const response = await AxiosConfig.get('/categories');
+  const response = await AxiosConfig.get('/categories/');
   return response.data;
 };
 
 const getCategoryById = async (id: number): Promise<Category> => {
-  const response = await AxiosConfig.get(`/categories/${id}`);
+  const response = await AxiosConfig.get(`/categories/${id}/`);
   return response.data;
 };
 
 const createCategory = async (categoryData: CreateCategoryRequest): Promise<Category> => {
-  const formData = new FormData();
-  formData.append('name', categoryData.name);
-  formData.append('slug', categoryData.slug);
-  if (categoryData.description) {
-    formData.append('description', categoryData.description);
-  }
-  if (categoryData.image) {
-    formData.append('image', categoryData.image);
-  }
+  const requestData = {
+    name: categoryData.name,
+    slug: categoryData.slug,
+    image: categoryData.image || '',
+    description: categoryData.description || ''
+  };
   
-  const response = await AxiosConfig.post('/categories', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+  const response = await AxiosConfig.post('/categories/', requestData);
   return response.data;
 };
 
 const updateCategory = async (categoryData: UpdateCategoryRequest): Promise<Category> => {
   const { id, ...updateData } = categoryData;
-  const formData = new FormData();
+  const requestData = {
+    name: updateData.name,
+    slug: updateData.slug,
+    image: updateData.image || '',
+    description: updateData.description || ''
+  };
   
-  Object.entries(updateData).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      if (value instanceof File) {
-        formData.append(key, value);
-      } else {
-        formData.append(key, String(value));
-      }
-    }
-  });
-  
-  const response = await AxiosConfig.post(`/categories/${id}/update`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+  const response = await AxiosConfig.put(`/categories/${id}/`, requestData);
   return response.data;
 };
 
 const deleteCategory = async (id: number): Promise<void> => {
-  await AxiosConfig.delete(`/categories/${id}`);
+  await AxiosConfig.delete(`/categories/${id}/`);
 };
 
 // Legacy API functions using fetch (for backward compatibility)
 const legacyCategoryAPI = {
-  getAll: () => apiRequest("/categories"),
-  getById: (id: number) => apiRequest(`/categories/${id}`),
+  getAll: () => apiRequest("/categories/"),
+  getById: (id: number) => apiRequest(`/categories/${id}/`),
   create: (data: any) => {
-    const isFormData = data instanceof FormData;
-    return apiRequest("/categories", {
+    return apiRequest("/categories/", {
       method: "POST",
-      body: isFormData ? data : JSON.stringify(data),
+      body: JSON.stringify(data),
     });
   },
   update: (id: number, data: any) => {
-    const isFormData = data instanceof FormData;
-    return apiRequest(`/categories/${id}`, {
+    return apiRequest(`/categories/${id}/`, {
       method: "PUT",
-      body: isFormData ? data : JSON.stringify(data),
+      body: JSON.stringify(data),
     });
   },
   delete: (id: number) =>
-    apiRequest(`/categories/${id}`, {
+    apiRequest(`/categories/${id}/`, {
       method: "DELETE",
     }),
 };

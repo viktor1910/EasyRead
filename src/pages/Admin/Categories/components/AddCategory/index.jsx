@@ -9,9 +9,7 @@ import {
   Box,
   Typography,
   CircularProgress,
-  IconButton,
 } from "@mui/material";
-import { PhotoCamera, Delete } from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
 import { useCreateCategory, useUpdateCategory } from "../../services";
 
@@ -23,7 +21,6 @@ const AddCategoryModal = ({
   mode = "add",
 }) => {
   const [imagePreview, setImagePreview] = useState(null);
-  const [selectedImage, setSelectedImage] = useState(null);
 
   const {
     control,
@@ -36,7 +33,7 @@ const AddCategoryModal = ({
     defaultValues: {
       name: "",
       slug: "",
-      image: null,
+      image_url: "",
     },
     mode: "onChange",
   });
@@ -45,6 +42,7 @@ const AddCategoryModal = ({
   const updateCategoryMutation = useUpdateCategory();
 
   const watchName = watch("name");
+  const watchImageUrl = watch("image_url");
 
   // Auto-generate slug from name
   useEffect(() => {
@@ -62,6 +60,15 @@ const AddCategoryModal = ({
     }
   }, [watchName, setValue]);
 
+  // Update image preview when URL changes
+  useEffect(() => {
+    if (watchImageUrl && watchImageUrl.trim()) {
+      setImagePreview(watchImageUrl);
+    } else {
+      setImagePreview(null);
+    }
+  }, [watchImageUrl]);
+
   // Set initial data when modal opens
   useEffect(() => {
     if (open) {
@@ -69,7 +76,7 @@ const AddCategoryModal = ({
         reset({
           name: initialData.name || "",
           slug: initialData.slug || "",
-          image: null,
+          image_url: initialData.image_url || "",
         });
         // Set image preview if editing and has existing image URL
         if (
@@ -82,48 +89,12 @@ const AddCategoryModal = ({
         reset({
           name: "",
           slug: "",
-          image: null,
+          image_url: "",
         });
         setImagePreview(null);
-        setSelectedImage(null);
       }
     }
   }, [initialData, mode, open, reset]);
-
-  // Handle image file selection
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith("image/")) {
-        alert("Vui lòng chọn file hình ảnh!");
-        return;
-      }
-
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        alert("File không được vượt quá 5MB!");
-        return;
-      }
-
-      setSelectedImage(file);
-      setValue("image", file);
-
-      // Create preview URL
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImagePreview(e.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  // Handle remove image
-  const handleRemoveImage = () => {
-    setSelectedImage(null);
-    setImagePreview(null);
-    setValue("image", null);
-  };
 
   const onSubmitForm = async (data) => {
     if (mode === "add") {
@@ -132,13 +103,12 @@ const AddCategoryModal = ({
         await createCategoryMutation.mutateAsync({
           name: data.name,
           slug: data.slug,
-          image: selectedImage,
+          image_url: data.image_url || "", // Pass URL string
         });
 
         // Reset form và đóng modal sau khi thành công
         reset();
         setImagePreview(null);
-        setSelectedImage(null);
         onClose();
       } catch (error) {
         console.error("Error creating category:", error);
@@ -151,13 +121,12 @@ const AddCategoryModal = ({
           id: initialData?.id,
           name: data.name,
           slug: data.slug,
-          image: selectedImage,
+          image_url: data.image_url || "", // Pass URL string
         });
 
         // Reset form và đóng modal sau khi thành công
         reset();
         setImagePreview(null);
-        setSelectedImage(null);
         onClose();
       } catch (error) {
         console.error("Error updating category:", error);
@@ -231,52 +200,32 @@ const AddCategoryModal = ({
             )}
           />
 
-          {/* Image Upload Section */}
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              Hình ảnh danh mục
-            </Typography>
-
-            <input
-              accept="image/*"
-              style={{ display: "none" }}
-              id="image-upload-button"
-              type="file"
-              onChange={handleImageChange}
-            />
-
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <label htmlFor="image-upload-button">
-                <Button
-                  variant="outlined"
-                  component="span"
-                  startIcon={<PhotoCamera />}
-                  sx={{ mb: imagePreview ? 1 : 0 }}
-                >
-                  Chọn hình ảnh
-                </Button>
-              </label>
-
-              {imagePreview && (
-                <IconButton
-                  onClick={handleRemoveImage}
-                  color="error"
-                  size="small"
-                  sx={{ mb: imagePreview ? 1 : 0 }}
-                >
-                  <Delete />
-                </IconButton>
-              )}
-            </Box>
-
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{ display: "block", mt: 0.5 }}
-            >
-              Định dạng: JPG, PNG, GIF. Kích thước tối đa: 5MB
-            </Typography>
-          </Box>
+          {/* Image URL Input */}
+          <Controller
+            name="image_url"
+            control={control}
+            rules={{
+              pattern: {
+                value: /^(https?:\/\/).*\.(jpg|jpeg|png|gif|webp)$/i,
+                message:
+                  "Vui lòng nhập URL hình ảnh hợp lệ (jpg, jpeg, png, gif, webp)",
+              },
+            }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="URL hình ảnh danh mục"
+                type="url"
+                fullWidth
+                placeholder="https://example.com/image.jpg"
+                error={!!errors.image_url}
+                helperText={
+                  errors.image_url?.message ||
+                  "Nhập đường dẫn URL đến hình ảnh danh mục"
+                }
+              />
+            )}
+          />
 
           {/* Image Preview */}
           {imagePreview && (
@@ -340,7 +289,6 @@ const AddCategoryModal = ({
           variant="contained"
           disabled={
             !isValid ||
-            (mode === "add" && !selectedImage) ||
             createCategoryMutation.isPending ||
             updateCategoryMutation.isPending
           }

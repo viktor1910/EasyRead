@@ -17,7 +17,8 @@ import { useGetCategories } from "../HomePage/components/Categories/hook";
 import { useGetBooks } from "../HomePage/components/AllProduct/hook";
 import BookItem from "../HomePage/components/BookItem";
 import { useNavigate } from "react-router";
-import { useCategory } from "../../services/categories/categoriesService";
+// Import centralized categories service instead of individual useCategory
+import { useCategories } from "../../services/categories/categoriesService";
 const CategoriesPage = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
