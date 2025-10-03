@@ -1,24 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
-import AxiosConfig from '../../../../AxiosConfig';
-import { Category } from './types';
+import { useCategories, useCategory } from '../../../../services/categories/categoriesService';
+import { Category } from '../../../../types/api';
 
-export const useGetCategories = () => {
-  return useQuery<Category[]>({
-    queryKey: ['categories'],
-    queryFn: async () => {
-      const res = await AxiosConfig.get('/categories/');
-      return res.data;
-    },
-  });
-}
+// Re-export centralized hooks with legacy names for backward compatibility
+export const useGetCategories = (params = {}) => {
+  return useCategories(params);
+};
 
 export const useGetCategoryById = (id: number | string) => {
-  return useQuery<Category>({
-    queryKey: ['categories', id],
-    queryFn: async () => {
-      const res = await AxiosConfig.get(`/categories/${id}/`);
-      return res.data;
-    },
-    enabled: !!id, // Only run query if id exists
-  });
-}
+  const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
+  return useCategory(numericId);
+};

@@ -1,11 +1,25 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import AxiosConfig from '../../AxiosConfig';
-import { apiRequest } from '../apiUtils';
-import { Category, CreateCategoryRequest, UpdateCategoryRequest } from '../../types/api';
+import { 
+  Category, 
+  CreateCategoryRequest, 
+  UpdateCategoryRequest, 
+  CategoriesQueryParams,
+  CategoryPaginationResponse 
+} from '../../types/api';
 
-// API functions using AxiosConfig (preferred)
-const getCategories = async (): Promise<Category[]> => {
-  const response = await AxiosConfig.get('/categories/');
+// API functions using AxiosConfig - Updated to match Django backend
+const getCategories = async (params: CategoriesQueryParams = {}): Promise<CategoryPaginationResponse> => {
+  const queryString = new URLSearchParams(
+    Object.entries(params).reduce((acc, [key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        acc[key] = String(value);
+      }
+      return acc;
+    }, {} as Record<string, string>)
+  ).toString();
+
+  const response = await AxiosConfig.get(`/categories/${queryString ? `?${queryString}` : ''}`);
   return response.data;
 };
 
@@ -18,8 +32,7 @@ const createCategory = async (categoryData: CreateCategoryRequest): Promise<Cate
   const requestData = {
     name: categoryData.name,
     slug: categoryData.slug,
-    image: categoryData.image || '',
-    description: categoryData.description || ''
+    image: categoryData.image || null // Match Django field name
   };
   
   const response = await AxiosConfig.post('/categories/', requestData);
@@ -31,8 +44,7 @@ const updateCategory = async (categoryData: UpdateCategoryRequest): Promise<Cate
   const requestData = {
     name: updateData.name,
     slug: updateData.slug,
-    image: updateData.image || '',
-    description: updateData.description || ''
+    image: updateData.image || null // Match Django field name
   };
   
   const response = await AxiosConfig.put(`/categories/${id}/`, requestData);
@@ -43,34 +55,13 @@ const deleteCategory = async (id: number): Promise<void> => {
   await AxiosConfig.delete(`/categories/${id}/`);
 };
 
-// Legacy API functions using fetch (for backward compatibility)
-const legacyCategoryAPI = {
-  getAll: () => apiRequest("/categories/"),
-  getById: (id: number) => apiRequest(`/categories/${id}/`),
-  create: (data: any) => {
-    return apiRequest("/categories/", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-  },
-  update: (id: number, data: any) => {
-    return apiRequest(`/categories/${id}/`, {
-      method: "PUT",
-      body: JSON.stringify(data),
-    });
-  },
-  delete: (id: number) =>
-    apiRequest(`/categories/${id}/`, {
-      method: "DELETE",
-    }),
-};
-
-// React Query hooks
-export const useCategories = () => {
+// React Query hooks - Updated for Django backend
+export const useCategories = (params: CategoriesQueryParams = {}, options: any = {}) => {
   return useQuery({
-    queryKey: ['categories'],
-    queryFn: getCategories,
+    queryKey: ['categories', params],
+    queryFn: () => getCategories(params),
     staleTime: 5 * 60 * 1000, // 5 minutes
+    ...options,
   });
 };
 
@@ -103,9 +94,9 @@ export const useUpdateCategory = () => {
 
   return useMutation({
     mutationFn: updateCategory,
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
-      queryClient.removeQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ['category', data.id] });
     },
     onError: (error) => {
       console.error('Error updating category:', error);
@@ -120,70 +111,9 @@ export const useDeleteCategory = () => {
     mutationFn: deleteCategory,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
-      queryClient.removeQueries({ queryKey: ['categories'] });
     },
     onError: (error) => {
       console.error('Error deleting category:', error);
     },
   });
 };
-
-// Legacy hooks for backward compatibility
-export const useCategoriesQuery = (options: any = {}) => {
-  return useQuery({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const response = await legacyCategoryAPI.getAll();
-      return response.data || response;
-    },
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    cacheTime: 30 * 60 * 1000, // 30 minutes
-    ...options,
-  });
-};
-
-export const useCategoryQuery = (id: number, options: any = {}) => {
-  return useQuery({
-    queryKey: ["category", id],
-    queryFn: () => legacyCategoryAPI.getById(id),
-    enabled: !!id,
-    ...options,
-  });
-};
-
-export const useCreateCategoryMutation = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (data: any) => legacyCategoryAPI.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
-    },
-  });
-};
-
-export const useUpdateCategoryMutation = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: any }) => legacyCategoryAPI.update(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
-      queryClient.invalidateQueries({ queryKey: ["category", id] });
-    },
-  });
-};
-
-export const useDeleteCategoryMutation = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: number) => legacyCategoryAPI.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
-    },
-  });
-};
-
-// Direct API exports for compatibility
-export const categoryAPI = legacyCategoryAPI;
