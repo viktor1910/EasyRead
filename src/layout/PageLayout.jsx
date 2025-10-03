@@ -27,11 +27,12 @@ import { useAuth } from "../context/AuthContext/AuthContext";
 import { useCart } from "../context/CartContext/CartContext";
 import { useNavigate, Link as RouterLink } from "react-router";
 import { useGetBooks } from "../pages/HomePage/components/AllProduct/hook";
+import { useMotoparts } from "../services";
 
 const drawerWidth = 240;
 
 const PageLayout = ({ children }) => {
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorEl, setAnchorEl] = (useState < null) | (HTMLElement > null);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [debouncedSearchKeyword, setDebouncedSearchKeyword] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
@@ -49,7 +50,7 @@ const PageLayout = ({ children }) => {
   }, [searchKeyword]);
 
   // Fetch search results
-  const { data: searchResults, isLoading: isSearching } = useGetBooks({
+  const { data: searchResults, isLoading: isSearching } = useMotoparts({
     keyword: debouncedSearchKeyword || undefined,
     pageSize: 10, // Limit search results
   });

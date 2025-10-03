@@ -14,7 +14,6 @@ const HomePage = () => (
   <Box>
     <Box sx={{ p: "4%" }}>
       <Stack direction="column" gap={4}>
-        <Top10Motopart />
         <Categories />
         <AllProduct />
       </Stack>

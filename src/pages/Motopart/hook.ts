@@ -1,47 +1,26 @@
 import { useQuery } from '@tanstack/react-query';
-import AxiosConfig from '../../AxiosConfig';
+import { Motopart, MotopartPaginationResponse } from '../../types/api';
+import { useMotoparts, useMotopart } from '../../services/motoparts/motopartsService';
 
-export interface MotopartDetail {
-  id: number;
-  name: string;
-  slug: string;
-  price: number;
-  discount: number;
-  stock: number;
-  status: 'active' | 'inactive' | 'out_of_stock';
-  description: string;
-  image_url: string;
-  category_id: number;
-  manufacture_year: number;
-  supplier: string;
-  created_at: string;
-  updated_at: string;
-  category?: {
-    id: number;
-    name: string;
-    slug: string;
-    description?: string;
-    image_url?: string;
-    created_at: string;
-    updated_at: string;
-  };
-}
-
-const fetchMotopartDetail = async (id: string): Promise<MotopartDetail> => {
-  try {
-    const response = await AxiosConfig.get(`/motoparts/${id}`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+// Updated to use the proper DetailView implementation
+export const useGetMotopartDetail = (id: number) => {
+  return useMotopart(id);
 };
 
-export const useGetMotopartDetail = (id: string) => {
-  return useQuery({
-    queryKey: ['motopart', id],
-    queryFn: () => fetchMotopartDetail(id),
-    enabled: !!id,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: 2,
+// Alternative: Use the main motoparts list to find specific item (for slug-based search)
+export const useGetMotopartFromList = (slug: string) => {
+  const { data: motopartsResponse, ...queryState } = useMotoparts({
+    search: slug, // Use search to find by name/description
+    page_size: 1, // Limit to 1 result
   });
+
+  const response = motopartsResponse as MotopartPaginationResponse | undefined;
+  const motopart = response?.results?.find((item: Motopart) => 
+    item.slug === slug || item.name.toLowerCase().includes(slug.toLowerCase())
+  ) || null;
+
+  return {
+    data: motopart,
+    ...queryState,
+  };
 };
