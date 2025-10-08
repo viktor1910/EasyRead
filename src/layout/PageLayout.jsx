@@ -46,10 +46,10 @@ const PageLayout = ({ children }) => {
     return () => clearTimeout(timer);
   }, [searchKeyword]);
 
-  // Fetch search results
+  // Fetch search results (use API param names expected by the motoparts service)
   const { data: searchResults, isLoading: isSearching } = useMotoparts({
-    keyword: debouncedSearchKeyword || undefined,
-    pageSize: 10, // Limit search results
+    search: debouncedSearchKeyword || undefined,
+    page_size: 10, // Limit search results
   });
 
   const handleMenu = (event) => {
@@ -96,7 +96,7 @@ const PageLayout = ({ children }) => {
   };
 
   const hasSearchResults =
-    searchResults && searchResults.data && searchResults.data.length > 0;
+    searchResults && searchResults.results && searchResults.results.length > 0;
 
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
@@ -154,7 +154,7 @@ const PageLayout = ({ children }) => {
                 >
                   <InputBase
                     sx={{ ml: 1, flex: 1 }}
-                    placeholder="Tìm sách..."
+                    placeholder="Tìm phụ tùng..."
                     value={searchKeyword}
                     onChange={handleSearchChange}
                     onFocus={handleSearchFocus}
@@ -196,7 +196,7 @@ const PageLayout = ({ children }) => {
                       </Box>
                     ) : hasSearchResults ? (
                       <List sx={{ py: 0 }}>
-                        {searchResults.data.slice(0, 8).map((book) => (
+                        {searchResults.results.slice(0, 8).map((book) => (
                           <ListItem
                             key={book.id}
                             button
@@ -209,11 +209,11 @@ const PageLayout = ({ children }) => {
                           >
                             <ListItemAvatar>
                               <Avatar
-                                src={book.image_full_url || book.image_url}
+                                src={book.image_url}
                                 variant="rounded"
                                 sx={{ width: 40, height: 40 }}
                               >
-                                {book.title.charAt(0)}
+                                {book.name?.charAt(0) || "#"}
                               </Avatar>
                             </ListItemAvatar>
                             <ListItemText
@@ -222,7 +222,7 @@ const PageLayout = ({ children }) => {
                                   variant="body2"
                                   sx={{ fontWeight: 500 }}
                                 >
-                                  {book.title}
+                                  {book.name}
                                 </Typography>
                               }
                               secondary={
@@ -231,7 +231,7 @@ const PageLayout = ({ children }) => {
                                     variant="caption"
                                     color="text.secondary"
                                   >
-                                    {book.price?.toLocaleString("vi-VN")} VNĐ
+                                    {book.price?.toLocaleString("vi-VN")} VND
                                   </Typography>
                                   {book.discount > 0 && (
                                     <Typography
@@ -247,7 +247,7 @@ const PageLayout = ({ children }) => {
                             />
                           </ListItem>
                         ))}
-                        {searchResults.data.length > 8 && (
+                        {searchResults.results.length > 8 && (
                           <ListItem
                             button
                             onClick={() => {
@@ -271,7 +271,8 @@ const PageLayout = ({ children }) => {
                                   variant="body2"
                                   sx={{ fontWeight: 500, textAlign: "center" }}
                                 >
-                                  Xem tất cả {searchResults.total} kết quả
+                                  Xem tt c {searchResults.pagination?.count} kt
+                                  qu
                                 </Typography>
                               }
                             />
@@ -430,68 +431,6 @@ const PageLayout = ({ children }) => {
               }}
             >
               Trang chủ
-            </Button>
-            {isAuthenticated() && (
-              <Button
-                component={RouterLink}
-                to="/orders"
-                sx={{
-                  textDecoration: "none",
-                  color: "inherit",
-                  fontWeight: 500,
-                  textTransform: "none",
-                }}
-              >
-                Đơn hàng
-              </Button>
-            )}
-            <Button
-              component={RouterLink}
-              to="/categories/thieu-nhi"
-              sx={{
-                textDecoration: "none",
-                color: "inherit",
-                fontWeight: 500,
-                textTransform: "none",
-              }}
-            >
-              Thiếu nhi
-            </Button>
-            <Button
-              component={RouterLink}
-              to="/categories/trinh-tham"
-              sx={{
-                textDecoration: "none",
-                color: "inherit",
-                fontWeight: 500,
-                textTransform: "none",
-              }}
-            >
-              Trinh thám
-            </Button>
-            <Button
-              component={RouterLink}
-              to="/categories/kiem-hiep"
-              sx={{
-                textDecoration: "none",
-                color: "inherit",
-                fontWeight: 500,
-                textTransform: "none",
-              }}
-            >
-              Kiếm hiệp
-            </Button>
-            <Button
-              component={RouterLink}
-              to="/categories/ngon-tinh"
-              sx={{
-                textDecoration: "none",
-                color: "inherit",
-                fontWeight: 500,
-                textTransform: "none",
-              }}
-            >
-              Ngôn tình
             </Button>
           </Box>
         </Box>

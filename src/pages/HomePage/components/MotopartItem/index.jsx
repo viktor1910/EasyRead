@@ -93,46 +93,6 @@ const MotopartItem = ({ motopart }) => {
         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
           {motopart.supplier}
         </Typography>
-
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-          Năm SX: {motopart.manufacture_year}
-        </Typography>
-
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          {motopart.discount > 0 && (
-            <Typography
-              variant="body2"
-              sx={{
-                textDecoration: "line-through",
-                color: "text.secondary",
-                fontSize: "0.875rem",
-              }}
-            >
-              {motopart.price?.toLocaleString("vi-VN")}đ
-            </Typography>
-          )}
-          <Typography
-            variant="body1"
-            sx={{
-              fontWeight: 600,
-              color: "primary.main",
-            }}
-          >
-            {discountedPrice?.toLocaleString("vi-VN")}đ
-          </Typography>
-        </Box>
-
-        {motopart.discount > 0 && (
-          <Typography
-            variant="caption"
-            sx={{
-              color: "error.main",
-              fontWeight: 500,
-            }}
-          >
-            -{motopart.discount}%
-          </Typography>
-        )}
       </Box>
     </Box>
   );

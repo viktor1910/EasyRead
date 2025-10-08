@@ -18,7 +18,8 @@ import { useMotoparts } from "../../services/motoparts";
 import MotopartItem from "../HomePage/components/MotopartItem";
 import { useNavigate } from "react-router";
 // Import centralized categories service instead of individual useCategory
-import { useCategories } from "../../services/categories/categoriesService";
+import { useCategory } from "../../services/categories/categoriesService";
+
 const CategoriesPage = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
@@ -46,13 +47,15 @@ const CategoriesPage = () => {
 
   const { data: categories, isLoading: loadingCategories } = useGetCategories();
   const { data: motoparts, isLoading: loadingMotoparts } = useMotoparts({
-    category_id: id,
+    category: id ? parseInt(id) : undefined,
     search: debouncedSearchKeyword || undefined,
+    page: 1,
+    page_size: 20,
   });
 
   // Get category detail when id is available
   const { data: categoryDetail, isLoading: loadingCategoryDetail } =
-    useCategory(parseInt(id), { enabled: !!id });
+    useCategory(id ? parseInt(id) : undefined, { enabled: !!id });
 
   const handleSearchChange = (event) => {
     setSearchKeyword(event.target.value);
@@ -62,7 +65,6 @@ const CategoriesPage = () => {
     setSearchKeyword("");
   };
 
-  console.log("CategoriesPage motoparts", motoparts);
   return (
     <Box display={"flex"} gap={3} padding={4} minHeight="100vh">
       {/* Sidebar danh mục bên trái - fixed width */}
@@ -121,7 +123,7 @@ const CategoriesPage = () => {
             </Typography>
             <TextField
               size="small"
-              placeholder="Tìm kiếm sách..."
+              placeholder="Tìm kiếm phụ tùng..."
               value={searchKeyword}
               onChange={handleSearchChange}
               InputProps={{
@@ -145,7 +147,8 @@ const CategoriesPage = () => {
               sx={{ width: 300 }}
             />
           </Box>
-        </Box>{" "}
+        </Box>
+
         {/* Danh sách tất cả sản phẩm */}
         <Box p={3} sx={{ backgroundColor: "#f5f5f5", borderRadius: "8px" }}>
           <Typography variant="h2" component="p" mb={2}>
@@ -163,8 +166,10 @@ const CategoriesPage = () => {
                 gap: 2,
               }}
             >
-              {motoparts && motoparts.data && motoparts.data.length > 0 ? (
-                motoparts.data.map((motopart) => (
+              {motoparts &&
+              motoparts.results &&
+              motoparts.results.length > 0 ? (
+                motoparts.results.map((motopart) => (
                   <MotopartItem key={motopart.id} motopart={motopart} />
                 ))
               ) : (

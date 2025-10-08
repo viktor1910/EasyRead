@@ -38,10 +38,11 @@ const AddMotopart = ({
 
   // Fetch categories with React Query
   const {
-    data: categories = [],
+    data: categoriesData,
     isLoading: loadingCategories,
     error: categoriesError,
   } = useCategories({ enabled: open });
+  const categories = (categoriesData && categoriesData.results) || [];
 
   // Create motopart mutation
   const createMotopartMutation = useCreateMotopart();
@@ -164,7 +165,7 @@ const AddMotopart = ({
         stock: parseInt(data.stock),
         status: data.status,
         description: data.description,
-        category: parseInt(data.category),
+        category_id: parseInt(data.category),
         manufacture_year: parseInt(data.manufacture_year),
         supplier: data.supplier,
       };

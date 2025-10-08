@@ -14,17 +14,17 @@ const getBooks = async (params: BooksQueryParams = {}): Promise<PaginationRespon
     }, {} as Record<string, string>)
   ).toString();
 
-  const response = await AxiosConfig.get(`/books${queryString ? `?${queryString}` : ''}`);
+  const response = await AxiosConfig.get(`/motoparts${queryString ? `?${queryString}` : ''}`);
   return response.data;
 };
 
 const getBookById = async (id: number): Promise<Book> => {
-  const response = await AxiosConfig.get(`/books/${id}`);
+  const response = await AxiosConfig.get(`/motoparts/${id}`);
   return response.data;
 };
 
 const getBookBySlug = async (slug: string): Promise<Book> => {
-  const response = await AxiosConfig.get(`/books/slug/${slug}`);
+  const response = await AxiosConfig.get(`/motoparts/slug/${slug}`);
   return response.data;
 };
 
@@ -41,7 +41,7 @@ const createBook = async (bookData: CreateBookRequest): Promise<Book> => {
     }
   });
   
-  const response = await AxiosConfig.post('/books', formData, {
+  const response = await AxiosConfig.post('/motoparts', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -63,7 +63,7 @@ const updateBook = async (bookData: UpdateBookRequest): Promise<Book> => {
     }
   });
   
-  const response = await AxiosConfig.post(`/books/${id}/update`, formData, {
+  const response = await AxiosConfig.post(`/motoparts/${id}/update`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -72,11 +72,11 @@ const updateBook = async (bookData: UpdateBookRequest): Promise<Book> => {
 };
 
 const deleteBook = async (id: number): Promise<void> => {
-  await AxiosConfig.delete(`/books/${id}`);
+  await AxiosConfig.delete(`/motoparts/${id}`);
 };
 
 const getMostOrderedBooks = async (): Promise<Book[]> => {
-  const response = await AxiosConfig.get('/books/most-ordered');
+  const response = await AxiosConfig.get('/motoparts/most-ordered');
   return response.data;
 };
 
@@ -91,76 +91,76 @@ const legacyBookAPI = {
         return acc;
       }, {} as Record<string, string>)
     ).toString();
-    return apiRequest(`/books${queryString ? `?${queryString}` : ''}`);
+  return apiRequest(`/motoparts${queryString ? `?${queryString}` : ''}`);
   },
-  getById: (id: number) => apiRequest(`/books/${id}`),
-  getBySlug: (slug: string) => apiRequest(`/books/slug/${slug}`),
+  getById: (id: number) => apiRequest(`/motoparts/${id}`),
+  getBySlug: (slug: string) => apiRequest(`/motoparts/slug/${slug}`),
   create: (data: any) => {
     const isFormData = data instanceof FormData;
-    return apiRequest('/books', {
+  return apiRequest('/motoparts', {
       method: 'POST',
       body: isFormData ? data : JSON.stringify(data),
     });
   },
   update: (id: number, data: any) => {
     const isFormData = data instanceof FormData;
-    return apiRequest(`/books/${id}`, {
+  return apiRequest(`/motoparts/${id}`, {
       method: 'PUT',
       body: isFormData ? data : JSON.stringify(data),
     });
   },
   delete: (id: number) =>
-    apiRequest(`/books/${id}`, {
+  apiRequest(`/motoparts/${id}`, {
       method: 'DELETE',
     }),
-  getMostOrdered: () => apiRequest('/books/most-ordered'),
+  getMostOrdered: () => apiRequest('/motoparts/most-ordered'),
 };
 
 // React Query hooks
-export const useBooks = (params: BooksQueryParams = {}, options: any = {}) => {
+export const useMotoparts = (params: BooksQueryParams = {}, options: any = {}) => {
   return useQuery({
-    queryKey: ['books', params],
+    queryKey: ['motoparts', params],
     queryFn: () => getBooks(params),
     staleTime: 5 * 60 * 1000, // 5 minutes
     ...options,
   });
 };
 
-export const useBook = (id: number, options: { enabled?: boolean } = {}) => {
+export const useMotopart = (id: number, options: { enabled?: boolean } = {}) => {
   return useQuery({
-    queryKey: ['book', id],
+    queryKey: ['motopart', id],
     queryFn: () => getBookById(id),
     enabled: !!id && (options.enabled !== false),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
-export const useBookBySlug = (slug: string, options: { enabled?: boolean } = {}) => {
+export const useMotopartBySlug = (slug: string, options: { enabled?: boolean } = {}) => {
   return useQuery({
-    queryKey: ['book', 'slug', slug],
+    queryKey: ['motopart', 'slug', slug],
     queryFn: () => getBookBySlug(slug),
     enabled: !!slug && (options.enabled !== false),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
-export const useMostOrderedBooks = (options: any = {}) => {
+export const useMostOrderedMotoparts = (options: any = {}) => {
   return useQuery({
-    queryKey: ['books', 'most-ordered'],
+    queryKey: ['motoparts', 'most-ordered'],
     queryFn: () => getMostOrderedBooks(),
     staleTime: 10 * 60 * 1000, // 10 minutes
     ...options,
   });
 };
 
-export const useCreateBook = () => {
+export const useCreateMotopart = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: createBook,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['books'] });
-      queryClient.removeQueries({ queryKey: ['books'] });
+      queryClient.invalidateQueries({ queryKey: ['motoparts'] });
+      queryClient.removeQueries({ queryKey: ['motoparts'] });
     },
     onError: (error) => {
       console.error('Error creating book:', error);
@@ -168,15 +168,15 @@ export const useCreateBook = () => {
   });
 };
 
-export const useUpdateBook = () => {
+export const useUpdateMotopart = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: updateBook,
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['books'] });
-      queryClient.invalidateQueries({ queryKey: ['book', data.id] });
-      queryClient.removeQueries({ queryKey: ['books'] });
+      queryClient.invalidateQueries({ queryKey: ['motoparts'] });
+      queryClient.invalidateQueries({ queryKey: ['motopart', data.id] });
+      queryClient.removeQueries({ queryKey: ['motoparts'] });
     },
     onError: (error) => {
       console.error('Error updating book:', error);
@@ -184,14 +184,14 @@ export const useUpdateBook = () => {
   });
 };
 
-export const useDeleteBook = () => {
+export const useDeleteMotopart = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: deleteBook,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['books'] });
-      queryClient.removeQueries({ queryKey: ['books'] });
+      queryClient.invalidateQueries({ queryKey: ['motoparts'] });
+      queryClient.removeQueries({ queryKey: ['motoparts'] });
     },
     onError: (error) => {
       console.error('Error deleting book:', error);
@@ -200,9 +200,9 @@ export const useDeleteBook = () => {
 };
 
 // Legacy hooks for backward compatibility
-export const useBooksQuery = (params: any = {}, options: any = {}) => {
+export const useMotopartsQuery = (params: any = {}, options: any = {}) => {
   return useQuery({
-    queryKey: ['books', params],
+    queryKey: ['motoparts', params],
     queryFn: async () => {
       const response = await legacyBookAPI.getAll(params);
       return response.data || response;
@@ -213,18 +213,18 @@ export const useBooksQuery = (params: any = {}, options: any = {}) => {
   });
 };
 
-export const useBookQuery = (id: number, options: any = {}) => {
+export const useMotopartQuery = (id: number, options: any = {}) => {
   return useQuery({
-    queryKey: ['book', id],
+    queryKey: ['motopart', id],
     queryFn: () => legacyBookAPI.getById(id),
     enabled: !!id,
     ...options,
   });
 };
 
-export const useMostOrderedBooksQuery = (options: any = {}) => {
+export const useMostOrderedMotopartsQuery = (options: any = {}) => {
   return useQuery({
-    queryKey: ['books', 'most-ordered'],
+    queryKey: ['motoparts', 'most-ordered'],
     queryFn: async () => {
       const response = await legacyBookAPI.getMostOrdered();
       return response.data || response;
@@ -235,39 +235,55 @@ export const useMostOrderedBooksQuery = (options: any = {}) => {
   });
 };
 
-export const useCreateBookMutation = () => {
+export const useCreateMotopartMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (data: any) => legacyBookAPI.create(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['books'] });
+      queryClient.invalidateQueries({ queryKey: ['motoparts'] });
     },
   });
 };
 
-export const useUpdateBookMutation = () => {
+export const useUpdateMotopartMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ id, data }: { id: number; data: any }) => legacyBookAPI.update(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['books'] });
-      queryClient.invalidateQueries({ queryKey: ['book', id] });
+      queryClient.invalidateQueries({ queryKey: ['motoparts'] });
+      queryClient.invalidateQueries({ queryKey: ['motopart', id] });
     },
   });
 };
 
-export const useDeleteBookMutation = () => {
+export const useDeleteMotopartMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (id: number) => legacyBookAPI.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['books'] });
+      queryClient.invalidateQueries({ queryKey: ['motoparts'] });
     },
   });
 };
 
 // Direct API exports for compatibility
-export const bookAPI = legacyBookAPI;
+export const motopartAPI = legacyBookAPI;
+
+// Backwards compatibility aliases (so existing imports keep working)
+export const useBooks = useMotoparts;
+export const useBook = useMotopart;
+export const useBookBySlug = useMotopartBySlug;
+export const useMostOrderedBooks = useMostOrderedMotoparts;
+export const useCreateBook = useCreateMotopart;
+export const useUpdateBook = useUpdateMotopart;
+export const useDeleteBook = useDeleteMotopart;
+export const useBooksQuery = useMotopartsQuery;
+export const useBookQuery = useMotopartQuery;
+export const useMostOrderedBooksQuery = useMostOrderedMotopartsQuery;
+export const useCreateBookMutation = useCreateMotopartMutation;
+export const useUpdateBookMutation = useUpdateMotopartMutation;
+export const useDeleteBookMutation = useDeleteMotopartMutation;
+export const bookAPI = legacyBookAPI; // keep old name as alias

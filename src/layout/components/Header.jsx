@@ -56,7 +56,7 @@ const Header = () => {
             borderRadius: 1,
           }}
         >
-          <InputBase sx={{ ml: 1, flex: 1 }} placeholder="Tìm sách..." />
+          <InputBase sx={{ ml: 1, flex: 1 }} placeholder="Tìm phụ tùng..." />
           <Button
             variant="contained"
             color="primary"
@@ -78,84 +78,6 @@ const Header = () => {
             <FavoriteIcon />
           </IconButton>
           <CartIcon />
-        </Box>
-      </Box>
-
-      {/* Main Navigation */}
-      <Box
-        sx={{
-          bgcolor: "grey.100",
-          px: 4,
-          py: 1,
-        }}
-      >
-        <Box
-          component="nav"
-          sx={{
-            display: "flex",
-            gap: 3,
-          }}
-        >
-          <Link
-            to="/"
-            style={{
-              textDecoration: "none",
-              color: "inherit",
-              fontWeight: 500,
-            }}
-          >
-            Trang chủ
-          </Link>
-          <Link
-            to="/categories/thieu-nhi"
-            style={{
-              textDecoration: "none",
-              color: "inherit",
-              fontWeight: 500,
-            }}
-          >
-            Thiếu nhi
-          </Link>
-          <Link
-            to="/categories/trinh-tham"
-            style={{
-              textDecoration: "none",
-              color: "inherit",
-              fontWeight: 500,
-            }}
-          >
-            Trinh thám
-          </Link>
-          <Link
-            to="/categories/kiem-hiep"
-            style={{
-              textDecoration: "none",
-              color: "inherit",
-              fontWeight: 500,
-            }}
-          >
-            Kiếm hiệp
-          </Link>
-          <Link
-            to="/categories/ngon-tinh"
-            style={{
-              textDecoration: "none",
-              color: "inherit",
-              fontWeight: 500,
-            }}
-          >
-            Ngôn tình
-          </Link>
-          <Link
-            to="/orders"
-            style={{
-              textDecoration: "none",
-              color: "inherit",
-              fontWeight: 500,
-            }}
-          >
-            Đơn hàng
-          </Link>
         </Box>
       </Box>
     </Box>

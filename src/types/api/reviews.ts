@@ -1,14 +1,14 @@
 import { BaseEntity } from './common';
-import { Book } from './books';
+import { Motopart } from './motoparts';
 import { User } from './auth';
 
 // Review types
 export interface Review extends BaseEntity {
-  book_id: number;
+  motopart_id: number;
   user_id: number;
   rating: number;
   comment?: string;
-  book?: Book;
+  motopart?: Motopart;
   user?: User;
 }
 
@@ -28,6 +28,7 @@ export interface ReviewsQueryParams {
   page?: number;
   limit?: number;
   book_id?: number;
+  motopart_id?: number;
   user_id?: number;
   rating?: number;
 }

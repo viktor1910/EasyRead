@@ -2,7 +2,6 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import AdminLayout from "./components/AdminLayout";
 import { Routes, Route } from "react-router";
-import BookManagement from "./Books";
 import MotopartManagement from "./Motoparts";
 import CategoryManagement from "./Categories";
 import ShippingManagement from "./Shipping";
@@ -27,7 +26,6 @@ const AdminPage = () => {
     <AdminLayout>
       <Routes>
         <Route path="/" element={<AdminDashboard />} />
-        <Route path="/books" element={<BookManagement />} />
         <Route path="/motoparts" element={<MotopartManagement />} />
         <Route path="/categories" element={<CategoryManagement />} />
         <Route path="/shipping" element={<ShippingManagement />} />

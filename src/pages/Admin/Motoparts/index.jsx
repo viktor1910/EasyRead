@@ -67,8 +67,12 @@ const MotopartManagement = () => {
   // Delete motopart mutation
   const deleteMotopartMutation = useDeleteMotopart();
 
-  const motoparts = motopartsResponse?.data || [];
-  const totalMotoparts = motopartsResponse?.total || motoparts.length;
+  // New API response shape: { results: [...], pagination: { count, ... } }
+  const motoparts = motopartsResponse?.results || motopartsResponse?.data || [];
+  const totalMotoparts =
+    motopartsResponse?.pagination?.count ??
+    motopartsResponse?.total ??
+    motoparts.length;
 
   const handleOpenAddModal = () => {
     setIsEdit(false);
@@ -230,7 +234,7 @@ const MotopartManagement = () => {
                     onClick={() => handleOpenDetailModal(motopart)}
                   >
                     <TableCell>{motopart.id}</TableCell>
-                    <TableCell>{motopart.name}</TableCell>
+                    <TableCell>{motopart.name || motopart.title}</TableCell>
                     <TableCell>{motopart.supplier}</TableCell>
                     <TableCell>{motopart.manufacture_year}</TableCell>
                     <TableCell>
@@ -243,22 +247,16 @@ const MotopartManagement = () => {
                     </TableCell>
                     <TableCell>{motopart.stock}</TableCell>
                     <TableCell>
-                      <span
-                        style={{
-                          color:
-                            motopart.status === "active"
-                              ? "green"
-                              : motopart.status === "inactive"
-                              ? "orange"
-                              : "red",
-                        }}
-                      >
-                        {motopart.status === "active"
-                          ? "Hoạt động"
-                          : motopart.status === "inactive"
-                          ? "Ngừng hoạt động"
-                          : "Hết hàng"}
-                      </span>
+                      {(() => {
+                        const isAvailable =
+                          typeof motopart.is_available === "boolean"
+                            ? motopart.is_available
+                            : motopart.status === "active" ||
+                              motopart.status === "available";
+                        const color = isAvailable ? "green" : "red";
+                        const text = isAvailable ? "Hoạt động" : "Hết hàng";
+                        return <span style={{ color }}>{text}</span>;
+                      })()}
                     </TableCell>
                     <TableCell align="center">
                       <IconButton

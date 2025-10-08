@@ -23,6 +23,8 @@ const CategoryItem = ({ category }) => {
       >
         <img
           src={
+            // prefer backend `image` field, fall back to legacy `image_url` if present
+            category?.image ||
             category?.image_url ||
             "https://contenthub-static.grammarly.com/blog/wp-content/uploads/2022/06/Memoir-vs.-Autobiography-437x233.jpg"
           }

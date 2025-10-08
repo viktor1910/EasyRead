@@ -38,7 +38,7 @@ export const useGetBookDetail = (bookId: string | number) => {
   return useQuery<BookDetail>({
     queryKey: ['book', bookId],
     queryFn: async () => {
-      const res = await AxiosConfig.get<BookDetail>(`/books/${bookId}`);
+        const res = await AxiosConfig.get<BookDetail>(`/motoparts/${bookId}`);
       console.log(res.data);
       return res.data;
     },

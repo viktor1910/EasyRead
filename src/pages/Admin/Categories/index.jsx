@@ -35,8 +35,10 @@ const CategoryManagement = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
 
-  // Sử dụng react-query để fetch categories
-  const { data: categories = [], isLoading, error, refetch } = useCategories();
+  // Sử dụng react-query để fetch categories (paginated response)
+  const { data: categoriesData, isLoading, error, refetch } = useCategories();
+  const categories = (categoriesData && categoriesData.results) || [];
+  const pagination = (categoriesData && categoriesData.pagination) || null;
   const deleteCategory = useDeleteCategory();
 
   console.log("Fetched categories:", categories);
@@ -157,7 +159,7 @@ const CategoryManagement = () => {
                   <TableRow key={category.id}>
                     <TableCell>
                       <img
-                        src={category.image_url}
+                        src={category.image || category.image_url}
                         alt={category.name}
                         style={{
                           width: 50,
@@ -167,7 +169,7 @@ const CategoryManagement = () => {
                         }}
                       />
                       {/* <Avatar
-                        src={category.image_url}
+                        src={category.image || category.image_url}
                         alt={category.name}
                         sx={{ width: 50, height: 50 }}
                         variant="rounded"
@@ -212,7 +214,7 @@ const CategoryManagement = () => {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={categories.length}
+            count={pagination ? pagination.count : categories.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

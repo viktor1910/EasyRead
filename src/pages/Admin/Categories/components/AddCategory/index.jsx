@@ -33,7 +33,7 @@ const AddCategoryModal = ({
     defaultValues: {
       name: "",
       slug: "",
-      image_url: "",
+      image: "",
     },
     mode: "onChange",
   });
@@ -42,7 +42,7 @@ const AddCategoryModal = ({
   const updateCategoryMutation = useUpdateCategory();
 
   const watchName = watch("name");
-  const watchImageUrl = watch("image_url");
+  const watchImage = watch("image");
 
   // Auto-generate slug from name
   useEffect(() => {
@@ -62,12 +62,13 @@ const AddCategoryModal = ({
 
   // Update image preview when URL changes
   useEffect(() => {
-    if (watchImageUrl && watchImageUrl.trim()) {
-      setImagePreview(watchImageUrl);
+    const img = watchImage || "";
+    if (img && img.trim()) {
+      setImagePreview(img);
     } else {
       setImagePreview(null);
     }
-  }, [watchImageUrl]);
+  }, [watchImage]);
 
   // Set initial data when modal opens
   useEffect(() => {
@@ -76,20 +77,19 @@ const AddCategoryModal = ({
         reset({
           name: initialData.name || "",
           slug: initialData.slug || "",
-          image_url: initialData.image_url || "",
+          // Prefer `image` but fall back to legacy `image_url` value
+          image: initialData.image || initialData.image_url || "",
         });
         // Set image preview if editing and has existing image URL
-        if (
-          initialData.image_url &&
-          typeof initialData.image_url === "string"
-        ) {
-          setImagePreview(initialData.image_url);
+        const imgPreview = initialData.image || initialData.image_url;
+        if (imgPreview && typeof imgPreview === "string") {
+          setImagePreview(imgPreview);
         }
       } else {
         reset({
           name: "",
           slug: "",
-          image_url: "",
+          image: "",
         });
         setImagePreview(null);
       }
@@ -103,7 +103,8 @@ const AddCategoryModal = ({
         await createCategoryMutation.mutateAsync({
           name: data.name,
           slug: data.slug,
-          image_url: data.image_url || "", // Pass URL string
+          // send to backend `image` field; keep empty string if missing
+          image: data.image || data.image_url || "",
         });
 
         // Reset form và đóng modal sau khi thành công
@@ -121,7 +122,7 @@ const AddCategoryModal = ({
           id: initialData?.id,
           name: data.name,
           slug: data.slug,
-          image_url: data.image_url || "", // Pass URL string
+          image: data.image || data.image_url || "",
         });
 
         // Reset form và đóng modal sau khi thành công
@@ -202,7 +203,7 @@ const AddCategoryModal = ({
 
           {/* Image URL Input */}
           <Controller
-            name="image_url"
+            name="image"
             control={control}
             rules={{
               pattern: {
@@ -218,9 +219,9 @@ const AddCategoryModal = ({
                 type="url"
                 fullWidth
                 placeholder="https://example.com/image.jpg"
-                error={!!errors.image_url}
+                error={!!errors.image}
                 helperText={
-                  errors.image_url?.message ||
+                  errors.image?.message ||
                   "Nhập đường dẫn URL đến hình ảnh danh mục"
                 }
               />
