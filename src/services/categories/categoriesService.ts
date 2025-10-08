@@ -29,13 +29,9 @@ const getCategoryById = async (id: number): Promise<Category> => {
 };
 
 const createCategory = async (categoryData: CreateCategoryRequest): Promise<Category> => {
-  const requestData = {
-    name: categoryData.name,
-    slug: categoryData.slug,
-    image: categoryData.image || null // Match Django field name
-  };
   
-  const response = await AxiosConfig.post('/categories/', requestData);
+  console.log('Creating category with data:', categoryData);
+  const response = await AxiosConfig.post('/categories/', categoryData);
   return response.data;
 };
 

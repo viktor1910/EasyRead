@@ -29,21 +29,28 @@ const getMotopartById = async (id: number): Promise<Motopart> => {
 };
 
 const createMotopart = async (motopartData: CreateMotopartRequest): Promise<Motopart> => {
-  const response = await AxiosConfig.post('/motoparts/', motopartData, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+  console.log('Creating motopart with data:', motopartData);
+  const response = await AxiosConfig.post('/motoparts/', motopartData);
   return response.data;
 };
 
 const updateMotopart = async (motopartData: UpdateMotopartRequest): Promise<Motopart> => {
   const { id, ...updateData } = motopartData;
-  const response = await AxiosConfig.put(`/motoparts/${id}/`, updateData, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+  const requestData = {
+    name: updateData.name,
+    slug: updateData.slug,
+    price: updateData.price,
+    discount: updateData.discount,
+    stock: updateData.stock,
+    status: updateData.status,
+    description: updateData.description,
+    image_url: updateData.image_url || null,
+    category_id: updateData.category_id,
+    manufacture_year: updateData.manufacture_year,
+    supplier: updateData.supplier,
+  };
+  
+  const response = await AxiosConfig.put(`/motoparts/${id}/`, requestData);
   return response.data;
 };
 
