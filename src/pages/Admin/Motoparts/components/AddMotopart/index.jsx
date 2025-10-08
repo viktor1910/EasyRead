@@ -15,7 +15,10 @@ import {
   Typography,
   CircularProgress,
   Alert,
+  IconButton,
 } from "@mui/material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
   useCreateMotopart,
   useUpdateMotopart,
@@ -32,6 +35,7 @@ const AddMotopart = ({
 }) => {
   const [error, setError] = useState("");
   const [imagePreview, setImagePreview] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const { showSuccess, showError } = useNotification();
 
@@ -72,13 +76,11 @@ const AddMotopart = ({
       category: "",
       manufacture_year: new Date().getFullYear(),
       supplier: "",
-      image_url: "",
     },
   });
 
   // Watch title to auto-generate slug
   const watchName = watch("name");
-  const watchImageUrl = watch("image_url");
 
   useEffect(() => {
     if (watchName && !isEdit) {
@@ -93,16 +95,6 @@ const AddMotopart = ({
       setValue("slug", slug);
     }
   }, [watchName, setValue, isEdit]);
-
-  // Update image preview when URL changes
-  useEffect(() => {
-    const img = watchImageUrl || "";
-    if (img && img.trim()) {
-      setImagePreview(img);
-    } else {
-      setImagePreview("");
-    }
-  }, [watchImageUrl]);
 
   // Reset form when dialog opens/closes
   useEffect(() => {
@@ -123,7 +115,6 @@ const AddMotopart = ({
           manufacture_year:
             initialMotopartData.manufacture_year || new Date().getFullYear(),
           supplier: initialMotopartData.supplier || "",
-          image_url: initialMotopartData.image_url || "",
         });
         // Set image preview if exists
         if (initialMotopartData.image_url) {
@@ -142,7 +133,6 @@ const AddMotopart = ({
           category: "",
           manufacture_year: new Date().getFullYear(),
           supplier: "",
-          image_url: "",
         });
       }
     }
@@ -151,16 +141,48 @@ const AddMotopart = ({
   const handleClose = () => {
     setError("");
     setImagePreview("");
+    setSelectedFile(null);
     reset();
     onClose();
+  };
+
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        showError("Vui lòng chọn file hình ảnh");
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        showError("Kích thước file không được vượt quá 5MB");
+        return;
+      }
+
+      setSelectedFile(file);
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedFile(null);
+    setImagePreview("");
   };
 
   const onSubmit = async (data) => {
     try {
       setError("");
 
-      // Prepare form data
-      const formData = {
+      // Prepare request data
+      const requestData = {
         name: data.name,
         slug: data.slug,
         price: parseFloat(data.price),
@@ -171,19 +193,23 @@ const AddMotopart = ({
         category_id: parseInt(data.category),
         manufacture_year: parseInt(data.manufacture_year),
         supplier: data.supplier,
-        image_url: data.image_url || "",
       };
+
+      // Add image file if selected
+      if (selectedFile) {
+        requestData.image = selectedFile;
+      }
 
       if (isEdit && initialMotopartData) {
         // Update existing motopart
         await updateMotopartMutation.mutateAsync({
           id: initialMotopartData.id,
-          ...formData,
+          ...requestData,
         });
         showSuccess("Cập nhật phụ tùng thành công!");
       } else {
         // Create new motopart
-        await createMotopartMutation.mutateAsync(formData);
+        await createMotopartMutation.mutateAsync(requestData);
         showSuccess("Thêm phụ tùng mới thành công!");
       }
 
@@ -405,20 +431,44 @@ const AddMotopart = ({
             {...register("description")}
           />
 
-          {/* Image URL Input */}
-          <TextField
-            label="URL hình ảnh phụ tùng"
-            fullWidth
-            variant="outlined"
-            margin="normal"
-            placeholder="https://example.com/image.jpg"
-            {...register("image_url")}
-            error={!!errors.image_url}
-            helperText={
-              errors.image_url?.message ||
-              "Nhập đường dẫn URL đến hình ảnh phụ tùng"
-            }
-          />
+          {/* Image Upload Section */}
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              Hình ảnh phụ tùng
+            </Typography>
+
+            {/* Upload Button */}
+            <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+              <Button
+                variant="outlined"
+                component="label"
+                startIcon={<CloudUploadIcon />}
+              >
+                Chọn file ảnh
+                <input
+                  type="file"
+                  hidden
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                />
+              </Button>
+
+              {selectedFile && (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    {selectedFile.name}
+                  </Typography>
+                  <IconButton
+                    size="small"
+                    onClick={handleRemoveImage}
+                    color="error"
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              )}
+            </Box>
+          </Box>
 
           {/* Image Preview */}
           {imagePreview && (
