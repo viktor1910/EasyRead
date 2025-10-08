@@ -34,7 +34,7 @@ const AddCategoryModal = ({
     defaultValues: {
       name: "",
       slug: "",
-      image: "",
+      image_url: "",
     },
     mode: "onChange",
   });
@@ -79,7 +79,7 @@ const AddCategoryModal = ({
         reset({
           name: "",
           slug: "",
-          image: "",
+          image_url: "",
         });
         setImagePreview(null);
       }

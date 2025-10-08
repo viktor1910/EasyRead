@@ -31,7 +31,6 @@ const AddMotopart = ({
   onSuccess,
 }) => {
   const [error, setError] = useState("");
-  const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
 
   const { showSuccess, showError } = useNotification();
@@ -73,29 +72,42 @@ const AddMotopart = ({
       category: "",
       manufacture_year: new Date().getFullYear(),
       supplier: "",
+      image_url: "",
     },
   });
 
   // Watch title to auto-generate slug
   const watchName = watch("name");
+  const watchImageUrl = watch("image_url");
 
   useEffect(() => {
     if (watchName && !isEdit) {
       const slug = watchName
         .toLowerCase()
-        .replace(/[^a-z0-9 -]/g, "")
-        .replace(/\s+/g, "-")
-        .replace(/-+/g, "-")
-        .trim();
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
+        .replace(/[^a-z0-9 ]/g, "") // Remove special characters
+        .replace(/\s+/g, "-") // Replace spaces with hyphens
+        .replace(/-+/g, "-") // Replace multiple hyphens with single
+        .trim("-"); // Remove leading/trailing hyphens
       setValue("slug", slug);
     }
   }, [watchName, setValue, isEdit]);
+
+  // Update image preview when URL changes
+  useEffect(() => {
+    const img = watchImageUrl || "";
+    if (img && img.trim()) {
+      setImagePreview(img);
+    } else {
+      setImagePreview("");
+    }
+  }, [watchImageUrl]);
 
   // Reset form when dialog opens/closes
   useEffect(() => {
     if (open) {
       setError("");
-      setImageFile(null);
       setImagePreview("");
       if (initialMotopartData && isEdit) {
         // Populate form with existing data
@@ -107,10 +119,11 @@ const AddMotopart = ({
           stock: initialMotopartData.stock || "",
           status: initialMotopartData.status || "active",
           description: initialMotopartData.description || "",
-          category: initialMotopartData.category_id || "",
+          category: initialMotopartData.category?.id || "",
           manufacture_year:
             initialMotopartData.manufacture_year || new Date().getFullYear(),
           supplier: initialMotopartData.supplier || "",
+          image_url: initialMotopartData.image_url || "",
         });
         // Set image preview if exists
         if (initialMotopartData.image_url) {
@@ -129,24 +142,14 @@ const AddMotopart = ({
           category: "",
           manufacture_year: new Date().getFullYear(),
           supplier: "",
+          image_url: "",
         });
       }
     }
   }, [open, initialMotopartData, isEdit, reset]);
 
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onload = (e) => setImagePreview(e.target.result);
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleClose = () => {
     setError("");
-    setImageFile(null);
     setImagePreview("");
     reset();
     onClose();
@@ -168,11 +171,8 @@ const AddMotopart = ({
         category_id: parseInt(data.category),
         manufacture_year: parseInt(data.manufacture_year),
         supplier: data.supplier,
+        image_url: data.image_url || "",
       };
-
-      if (imageFile) {
-        formData.image = imageFile;
-      }
 
       if (isEdit && initialMotopartData) {
         // Update existing motopart
@@ -405,32 +405,72 @@ const AddMotopart = ({
             {...register("description")}
           />
 
-          {/* Image Upload */}
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="subtitle1" gutterBottom>
-              Hình ảnh phụ tùng
-            </Typography>
-            <input
-              accept="image/*"
-              type="file"
-              onChange={handleImageChange}
-              style={{ marginBottom: 16 }}
-            />
-            {imagePreview && (
-              <Box sx={{ mt: 2 }}>
+          {/* Image URL Input */}
+          <TextField
+            label="URL hình ảnh phụ tùng"
+            fullWidth
+            variant="outlined"
+            margin="normal"
+            placeholder="https://example.com/image.jpg"
+            {...register("image_url")}
+            error={!!errors.image_url}
+            helperText={
+              errors.image_url?.message ||
+              "Nhập đường dẫn URL đến hình ảnh phụ tùng"
+            }
+          />
+
+          {/* Image Preview */}
+          {imagePreview && (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                Xem trước hình ảnh:
+              </Typography>
+              <Box
+                sx={{
+                  width: 200,
+                  height: 200,
+                  border: "2px dashed #ddd",
+                  borderRadius: 2,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  overflow: "hidden",
+                  backgroundColor: "#f9f9f9",
+                  position: "relative",
+                }}
+              >
                 <img
                   src={imagePreview}
                   alt="Preview"
                   style={{
-                    maxWidth: "200px",
-                    maxHeight: "200px",
+                    width: "100%",
+                    height: "100%",
                     objectFit: "cover",
-                    borderRadius: 8,
+                  }}
+                  onError={(e) => {
+                    e.target.style.display = "none";
+                    e.target.nextSibling.style.display = "flex";
                   }}
                 />
+                <Box
+                  sx={{
+                    display: "none",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "100%",
+                    height: "100%",
+                    color: "text.secondary",
+                    fontSize: "12px",
+                    textAlign: "center",
+                    px: 1,
+                  }}
+                >
+                  Không thể tải hình ảnh
+                </Box>
               </Box>
-            )}
-          </Box>
+            </Box>
+          )}
         </Box>
       </DialogContent>
       <DialogActions>
