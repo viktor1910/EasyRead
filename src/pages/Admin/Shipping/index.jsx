@@ -60,11 +60,14 @@ const ShippingManagement = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [debouncedSearchKeyword, setDebouncedSearchKeyword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  // Define status groups
-  const historyStatuses = ["completed", "cancelled"];
-  const incomingStatuses = ["pending", "paid", "shipped"];
-  const currentStatuses = currentTab === 0 ? incomingStatuses : historyStatuses;
+  // Define status groups - match backend Django statuses
+  // Tab 0: Orders that can be processed (pending, confirmed, processing, shipped)
+  // Tab 1: Completed/Cancelled orders (delivered, cancelled, refunded)
+  const currentStatuses = currentTab === 0
+    ? ['pending', 'confirmed', 'processing', 'shipped']
+    : ['delivered', 'cancelled', 'refunded'];
 
   // Debounce search keyword
   useEffect(() => {
@@ -142,10 +145,12 @@ const ShippingManagement = () => {
     setOpenStatusModal(false);
     setOrderToUpdate(null);
     setNewStatus("");
+    setErrorMessage("");
   };
 
   const handleConfirmStatusUpdate = async () => {
     if (orderToUpdate && newStatus && newStatus !== orderToUpdate.status) {
+      setErrorMessage(""); // Clear previous errors
       try {
         await updateStatusMutation.mutateAsync({
           id: orderToUpdate.id,
@@ -155,6 +160,32 @@ const ShippingManagement = () => {
         // Refresh data will be handled by React Query invalidation
       } catch (error) {
         console.error("Error updating order status:", error);
+        // Extract error message from response
+        let errorMsg = "Có lỗi xảy ra khi cập nhật trạng thái đơn hàng";
+
+        if (error?.response?.data) {
+          const data = error.response.data;
+
+          // Check for different error formats
+          if (data.status && Array.isArray(data.status)) {
+            // Django validation error format: {status: ["error message"]}
+            errorMsg = data.status.join(", ");
+          } else if (typeof data.status === 'string') {
+            errorMsg = data.status;
+          } else if (data.message) {
+            errorMsg = data.message;
+          } else if (data.error) {
+            errorMsg = data.error;
+          } else if (data.errors) {
+            errorMsg = typeof data.errors === 'string' ? data.errors : JSON.stringify(data.errors);
+          } else if (data.detail) {
+            errorMsg = data.detail;
+          }
+        } else if (error?.message) {
+          errorMsg = error.message;
+        }
+
+        setErrorMessage(errorMsg);
       }
     } else {
       handleCloseStatusModal();
@@ -165,13 +196,17 @@ const ShippingManagement = () => {
     switch (status) {
       case "pending":
         return "warning";
-      case "paid":
+      case "confirmed":
+        return "info";
+      case "processing":
         return "info";
       case "shipped":
         return "primary";
-      case "completed":
+      case "delivered":
         return "success";
       case "cancelled":
+        return "error";
+      case "refunded":
         return "error";
       default:
         return "default";
@@ -182,14 +217,18 @@ const ShippingManagement = () => {
     switch (status) {
       case "pending":
         return "Chờ xử lý";
-      case "paid":
-        return "Đã thanh toán";
+      case "confirmed":
+        return "Đã xác nhận";
+      case "processing":
+        return "Đang xử lý";
       case "shipped":
         return "Đã gửi hàng";
-      case "completed":
-        return "Hoàn thành";
+      case "delivered":
+        return "Đã giao hàng";
       case "cancelled":
         return "Đã hủy";
+      case "refunded":
+        return "Đã hoàn tiền";
       default:
         return status;
     }
@@ -268,18 +307,16 @@ const ShippingManagement = () => {
                       >
                         <VisibilityIcon />
                       </IconButton>
-                      {currentTab === 0 && ( // Only show edit for incoming orders
-                        <IconButton
-                          color="secondary"
-                          onClick={(event) =>
-                            handleOpenStatusModal(order, event)
-                          }
-                          size="small"
-                          title="Cập nhật trạng thái"
-                        >
-                          <EditIcon />
-                        </IconButton>
-                      )}
+                      <IconButton
+                        color="secondary"
+                        onClick={(event) =>
+                          handleOpenStatusModal(order, event)
+                        }
+                        size="small"
+                        title="Cập nhật trạng thái"
+                      >
+                        <EditIcon />
+                      </IconButton>
                     </TableCell>
                   </TableRow>
                 ))
@@ -424,7 +461,7 @@ const ShippingManagement = () => {
                     <Table size="small">
                       <TableHead>
                         <TableRow>
-                          <TableCell>Sách</TableCell>
+                          <TableCell>Sản phẩm</TableCell>
                           <TableCell align="center">Số lượng</TableCell>
                           <TableCell align="right">Đơn giá</TableCell>
                           <TableCell align="right">Thành tiền</TableCell>
@@ -433,7 +470,7 @@ const ShippingManagement = () => {
                       <TableBody>
                         {selectedOrder.items.map((item) => (
                           <TableRow key={item.id}>
-                            <TableCell>{item.book?.title || "N/A"}</TableCell>
+                            <TableCell>{item.motopart?.name || "N/A"}</TableCell>
                             <TableCell align="center">
                               {item.quantity}
                             </TableCell>
@@ -473,6 +510,11 @@ const ShippingManagement = () => {
           Cập nhật trạng thái đơn hàng #{orderToUpdate?.id}
         </DialogTitle>
         <DialogContent>
+          {errorMessage && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {errorMessage}
+            </Alert>
+          )}
           <Box sx={{ mt: 2 }}>
             <FormControl fullWidth>
               <InputLabel>Trạng thái</InputLabel>
@@ -482,10 +524,12 @@ const ShippingManagement = () => {
                 onChange={(e) => setNewStatus(e.target.value)}
               >
                 <MenuItem value="pending">Chờ xử lý</MenuItem>
-                <MenuItem value="paid">Đã thanh toán</MenuItem>
+                <MenuItem value="confirmed">Đã xác nhận</MenuItem>
+                <MenuItem value="processing">Đang xử lý</MenuItem>
                 <MenuItem value="shipped">Đã gửi hàng</MenuItem>
-                <MenuItem value="completed">Hoàn thành</MenuItem>
+                <MenuItem value="delivered">Đã giao hàng</MenuItem>
                 <MenuItem value="cancelled">Hủy đơn</MenuItem>
+                <MenuItem value="refunded">Hoàn tiền</MenuItem>
               </Select>
             </FormControl>
           </Box>

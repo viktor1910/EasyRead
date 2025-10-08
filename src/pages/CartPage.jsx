@@ -175,7 +175,7 @@ const CartPage = () => {
                   <Box
                     component="img"
                     src={
-                      item.motopart?.image_url || "/placeholder-motopart.jpg"
+                      item.motopart?.image_full_url || item.motopart?.image_url || "/placeholder-motopart.jpg"
                     }
                     alt={item.motopart?.name}
                     sx={{

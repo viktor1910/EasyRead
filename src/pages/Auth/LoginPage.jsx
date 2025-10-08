@@ -19,25 +19,63 @@ const LoginPage = () => {
     password: "",
   });
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({
+    email: "",
+    password: "",
+  });
   const [loading, setLoading] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
-    // Clear error when user starts typing
+    // Clear errors when user starts typing
     if (error) {
       setError("");
+    }
+    if (fieldErrors[name]) {
+      setFieldErrors({
+        ...fieldErrors,
+        [name]: "",
+      });
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(""); // Clear previous errors
+    setFieldErrors({ email: "", password: "" });
+
+    // Basic validation
+    let hasError = false;
+    const newFieldErrors = { email: "", password: "" };
+
+    if (!formData.email) {
+      newFieldErrors.email = "Vui lòng nhập email";
+      hasError = true;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newFieldErrors.email = "Email không hợp lệ";
+      hasError = true;
+    }
+
+    if (!formData.password) {
+      newFieldErrors.password = "Vui lòng nhập mật khẩu";
+      hasError = true;
+    } else if (formData.password.length < 6) {
+      newFieldErrors.password = "Mật khẩu phải có ít nhất 6 ký tự";
+      hasError = true;
+    }
+
+    if (hasError) {
+      setFieldErrors(newFieldErrors);
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -110,6 +148,8 @@ const LoginPage = () => {
               value={formData.email}
               onChange={handleChange}
               disabled={loading}
+              error={!!fieldErrors.email}
+              helperText={fieldErrors.email}
             />
             <TextField
               margin="normal"
@@ -123,6 +163,8 @@ const LoginPage = () => {
               value={formData.password}
               onChange={handleChange}
               disabled={loading}
+              error={!!fieldErrors.password}
+              helperText={fieldErrors.password}
             />
             <Button
               type="submit"

@@ -6,7 +6,7 @@ export interface Order {
   id?: number;
   user_id: number;
   total_price: string; // API trả về string, không phải number
-  status: 'pending' | 'paid' | 'shipped' | 'completed' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded';
   shipping_address: string | null;
   payment_method: string | null;
   shipping_status: string | null;
@@ -29,25 +29,24 @@ export interface Order {
 export interface OrderItem {
   id?: number;
   order_id: number;
-  book_id: number;
+  motopart_id: number;
   quantity: number;
   price: string; // API trả về string, không phải number
   created_at?: string;
   updated_at?: string;
-  book?: {
+  motopart?: {
     id: number;
-    title: string;
+    name: string;
     slug: string;
     price: number;
     discount: number | null;
     stock: number;
-    status: 'available' | 'out_of_stock';
+    is_available: boolean;
     description: string;
     image_url: string;
     category_id: number | null;
-    author_id: number;
-    published_year: number;
-    publisher: string;
+    supplier: string;
+    manufacture_year: number;
     created_at: string;
     updated_at: string;
     image_full_url: string;
@@ -93,25 +92,49 @@ export interface OrdersResponse {
 
 // API function để get all orders với pagination và filter
 const getAllOrders = async (params: OrdersQueryParams = {}): Promise<OrdersResponse> => {
+  console.log('[getAllOrders] Called with params:', params);
   const queryParams = new URLSearchParams();
-  
+
   // Handle basic parameters
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
       if (key === 'status' && Array.isArray(value)) {
-        // Convert status array to comma-separated string
-        if (value.length > 0) {
-          queryParams.append('status', value.join(','));
-        }
+        // For Django, send each status as separate parameter
+        value.forEach(status => {
+          queryParams.append('status', status);
+        });
+      } else if (key === 'limit') {
+        // Django uses page_size instead of limit
+        queryParams.append('page_size', String(value));
       } else if (!Array.isArray(value)) {
         queryParams.append(key, String(value));
       }
     }
   });
-  
+
   const queryString = queryParams.toString();
-  const response = await AxiosConfig.get(`/orders/admin/listall${queryString ? `?${queryString}` : ''}`);
-  return response.data;
+  const url = `/orders/admin/${queryString ? `?${queryString}` : ''}`;
+  console.log('[getAllOrders] Requesting URL:', url);
+  const response = await AxiosConfig.get(url);
+  console.log('[getAllOrders] Response:', response.data);
+
+  // Transform Django pagination response to expected format
+  const data = response.data;
+  return {
+    current_page: data.current_page || 1,
+    data: data.results || data.data || [],
+    first_page_url: '',
+    from: ((data.current_page || 1) - 1) * (data.page_size || 10) + 1,
+    last_page: data.total_pages || 1,
+    last_page_url: '',
+    links: [],
+    next_page_url: data.next || null,
+    path: '',
+    per_page: data.page_size || 10,
+    prev_page_url: data.previous || null,
+    to: Math.min((data.current_page || 1) * (data.page_size || 10), data.count || 0),
+    total: data.count || 0,
+  };
 };
 
 // API function để get order by id
@@ -122,8 +145,8 @@ const getOrderById = async (id: number): Promise<Order> => {
 
 // API function để update order status
 const updateOrderStatus = async (id: number, status: Order['status']): Promise<Order> => {
-  const response = await AxiosConfig.put(`/orders/${id}/update`, { status });
-  return response.data;
+  const response = await AxiosConfig.put(`/orders/${id}/status/`, { status });
+  return response.data.order || response.data;
 };
 
 // React Query hook để get all orders với pagination

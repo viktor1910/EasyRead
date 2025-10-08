@@ -23,9 +23,8 @@ const CategoryItem = ({ category }) => {
       >
         <img
           src={
-            // prefer backend `image` field, fall back to legacy `image_url` if present
+            category?.image_full_url ||
             category?.image ||
-            category?.image_url ||
             "https://contenthub-static.grammarly.com/blog/wp-content/uploads/2022/06/Memoir-vs.-Autobiography-437x233.jpg"
           }
           alt={category?.name || "Motopart Category"}
@@ -51,7 +50,7 @@ const CategoryItem = ({ category }) => {
             textShadow: "-4px 1px 6px rgba(0,0,0,0.58)",
           }}
         >
-          300 motoparts
+          {category?.motoparts_count || 0} sản phẩm
         </Typography>
       </Box>
     </Box>

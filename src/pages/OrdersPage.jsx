@@ -48,8 +48,10 @@ const OrdersPage = () => {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("/orders/");
-      setOrders(response.data);
+      const response = await axios.get("/orders/?page_size=100");
+      // Backend returns paginated data with 'results' field
+      const ordersData = response.data.results || response.data;
+      setOrders(Array.isArray(ordersData) ? ordersData : []);
     } catch (err) {
       setError("Không thể tải danh sách đơn hàng");
       console.error("Error fetching orders:", err);
@@ -72,13 +74,17 @@ const OrdersPage = () => {
     switch (status) {
       case "pending":
         return "warning";
-      case "paid":
+      case "confirmed":
+        return "info";
+      case "processing":
         return "info";
       case "shipped":
         return "primary";
-      case "completed":
+      case "delivered":
         return "success";
       case "cancelled":
+        return "error";
+      case "refunded":
         return "error";
       default:
         return "default";
@@ -89,13 +95,17 @@ const OrdersPage = () => {
     switch (status) {
       case "pending":
         return <AccessTimeIcon />;
-      case "paid":
+      case "confirmed":
         return <ReceiptIcon />;
+      case "processing":
+        return <ShoppingBagIcon />;
       case "shipped":
         return <LocalShippingIcon />;
-      case "completed":
+      case "delivered":
         return <CheckCircleIcon />;
       case "cancelled":
+        return <CancelIcon />;
+      case "refunded":
         return <CancelIcon />;
       default:
         return <ShoppingBagIcon />;
@@ -106,14 +116,18 @@ const OrdersPage = () => {
     switch (status) {
       case "pending":
         return "Chờ xử lý";
-      case "paid":
-        return "Đã thanh toán";
+      case "confirmed":
+        return "Đã xác nhận";
+      case "processing":
+        return "Đang xử lý";
       case "shipped":
         return "Đang giao hàng";
-      case "completed":
-        return "Hoàn thành";
+      case "delivered":
+        return "Đã giao hàng";
       case "cancelled":
         return "Đã hủy";
+      case "refunded":
+        return "Đã hoàn tiền";
       default:
         return status;
     }
@@ -198,11 +212,11 @@ const OrdersPage = () => {
 
       <Grid container spacing={4}>
         {orders.map((order) => (
-          <Grid item xs={12} sm={6} md={4} key={order.id}>
+          <Grid item xs={12} sm={6} md={6} lg={4} key={order.id}>
             <Card
               sx={{
                 height: "100%",
-                minHeight: "280px",
+                minHeight: "320px",
                 cursor: "pointer",
                 border:
                   selectedOrder?.id === order.id ? "2px solid" : "1px solid",
@@ -259,13 +273,8 @@ const OrdersPage = () => {
                 </Typography>
 
                 {/* Products count and total */}
-                <Box
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  mb={3}
-                >
-                  <Typography variant="body1" fontWeight={500}>
+                <Box mb={3}>
+                  <Typography variant="body1" fontWeight={500} sx={{ mb: 1.5 }}>
                     {order.items?.length || 0} sản phẩm
                   </Typography>
                   <Typography variant="h5" color="primary" fontWeight={700}>

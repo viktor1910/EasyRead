@@ -28,12 +28,12 @@ const legacyAuthAPI = {
   login: (email: string, password: string) =>
     apiRequest('/users/login/', {
       method: 'POST',
-      body: JSON.stringify({ email, password }),
+      body: { email, password },
     }),
   register: (data: any) =>
     apiRequest('/users/register/', {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: data,
     }),
   logout: () =>
     apiRequest('/users/logout/', {
