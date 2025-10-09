@@ -16,55 +16,23 @@ export const CartProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch active cart
+  // Fetch cart data
   const fetchCart = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/carts/active/');
-
-      // Transform backend response to match frontend expectations
-      const cartData = {
-        id: response.data.id,
-        items: response.data.items || [],
-        subtotal: response.data.subtotal || 0,
-        items_count: response.data.items_count || 0,
-        status: response.data.status
-      };
-
-      setCart(cartData);
+      const response = await axios.get('/cart/');
+      setCart(response.data.cart);
       setError(null);
-      return cartData; // Return cart data
     } catch (err) {
       console.error('Error fetching cart:', err);
-
-      // If 404, user doesn't have active cart - create one
-      if (err.response?.status === 404) {
-        try {
-          const createResponse = await axios.post('/carts/create/');
-          const cartData = {
-            id: createResponse.data.cart.id,
-            items: [],
-            subtotal: 0,
-            items_count: 0,
-            status: 'active'
-          };
-          setCart(cartData);
-          setError(null);
-          return cartData; // Return new cart data
-        } catch (createErr) {
-          console.error('Error creating cart:', createErr);
-          setError('Không thể tạo giỏ hàng');
-          setCart({ items: [], subtotal: 0, items_count: 0 });
-          return null;
-        }
-      } else if (err.response?.status === 401) {
+      
+      // Nếu lỗi 401, user chưa đăng nhập
+      if (err.response?.status === 401) {
         setCart({ items: [], subtotal: 0, items_count: 0 });
         setError('Vui lòng đăng nhập để xem giỏ hàng');
-        return null;
       } else {
         setError('Không thể tải giỏ hàng');
-        setCart({ items: [], subtotal: 0, items_count: 0 });
-        return null;
+        setCart(null);
       }
     } finally {
       setLoading(false);
@@ -72,41 +40,27 @@ export const CartProvider = ({ children }) => {
   };
 
   // Add item to cart
-  const addToCart = async (motopartId, quantity = 1) => {
+  const addToCart = async (bookId, quantity = 1) => {
     try {
       setLoading(true);
-
-      // Ensure we have a cart - use the returned cart data directly
-      let currentCart = cart;
-      if (!currentCart || !currentCart.id) {
-        currentCart = await fetchCart();
-      }
-
-      // If fetchCart failed or returned null
-      if (!currentCart || !currentCart.id) {
-        throw new Error('Không thể tạo hoặc lấy giỏ hàng');
-      }
-
-      const response = await axios.post(`/cartitems/cart/${currentCart.id}/add/`, {
-        motopart_id: motopartId,
+      const response = await axios.post('/cart/add', {
+        book_id: bookId,
         quantity: quantity
       });
-
-      // Refresh cart after adding
-      await fetchCart();
+      setCart(response.data);
       setError(null);
-      return { success: true, message: 'Đã thêm vào giỏ hàng' };
+      return { success: true };
     } catch (err) {
       console.error('Error adding to cart:', err);
-
+      
+      // Nếu lỗi 401, user chưa đăng nhập
       if (err.response?.status === 401) {
         setError('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng');
         return { success: false, error: 'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng' };
       }
-
-      const errorMsg = err.response?.data?.message || err.message || 'Không thể thêm vào giỏ hàng';
-      setError(errorMsg);
-      return { success: false, error: errorMsg };
+      
+      setError(err.response?.data?.message || 'Không thể thêm vào giỏ hàng');
+      return { success: false, error: err.response?.data?.message || 'Không thể thêm vào giỏ hàng' };
     } finally {
       setLoading(false);
     }
@@ -114,31 +68,20 @@ export const CartProvider = ({ children }) => {
 
   // Update item quantity
   const updateQuantity = async (itemId, newQuantity) => {
-    if (newQuantity < 1) {
-      return removeItem(itemId);
-    }
-
+    if (newQuantity < 0) return { success: false, error: 'Số lượng không hợp lệ' };
+    
     try {
       setLoading(true);
-
-      const cartId = cart?.id;
-      if (!cartId) {
-        throw new Error('No active cart');
-      }
-
-      await axios.put(`/cartitems/cart/${cartId}/items/${itemId}/update/`, {
+      const response = await axios.put(`/cart/update/${itemId}`, {
         quantity: newQuantity
       });
-
-      // Refresh cart after updating
-      await fetchCart();
+      setCart(response.data);
       setError(null);
       return { success: true };
     } catch (err) {
       console.error('Error updating quantity:', err);
-      const errorMsg = err.response?.data?.message || 'Không thể cập nhật số lượng';
-      setError(errorMsg);
-      return { success: false, error: errorMsg };
+      setError(err.response?.data?.message || 'Không thể cập nhật số lượng');
+      return { success: false, error: err.response?.data?.message || 'Không thể cập nhật số lượng' };
     } finally {
       setLoading(false);
     }
@@ -148,23 +91,14 @@ export const CartProvider = ({ children }) => {
   const removeItem = async (itemId) => {
     try {
       setLoading(true);
-
-      const cartId = cart?.id;
-      if (!cartId) {
-        throw new Error('No active cart');
-      }
-
-      await axios.delete(`/cartitems/cart/${cartId}/items/${itemId}/remove/`);
-
-      // Refresh cart after removing
-      await fetchCart();
+      const response = await axios.delete(`/cart/remove/${itemId}`);
+      setCart(response.data);
       setError(null);
       return { success: true };
     } catch (err) {
       console.error('Error removing item:', err);
-      const errorMsg = err.response?.data?.message || 'Không thể xóa sản phẩm';
-      setError(errorMsg);
-      return { success: false, error: errorMsg };
+      setError(err.response?.data?.message || 'Không thể xóa sản phẩm');
+      return { success: false, error: err.response?.data?.message || 'Không thể xóa sản phẩm' };
     } finally {
       setLoading(false);
     }
@@ -174,23 +108,14 @@ export const CartProvider = ({ children }) => {
   const clearCart = async () => {
     try {
       setLoading(true);
-
-      const cartId = cart?.id;
-      if (!cartId) {
-        throw new Error('No active cart');
-      }
-
-      await axios.delete(`/cartitems/cart/${cartId}/clear/`);
-
-      // Refresh cart after clearing
-      await fetchCart();
+      await axios.delete('/cart/clear');
+      setCart({ items: [], subtotal: 0, items_count: 0 });
       setError(null);
       return { success: true };
     } catch (err) {
       console.error('Error clearing cart:', err);
-      const errorMsg = err.response?.data?.message || 'Không thể xóa giỏ hàng';
-      setError(errorMsg);
-      return { success: false, error: errorMsg };
+      setError(err.response?.data?.message || 'Không thể xóa giỏ hàng');
+      return { success: false, error: err.response?.data?.message || 'Không thể xóa giỏ hàng' };
     } finally {
       setLoading(false);
     }
@@ -200,23 +125,15 @@ export const CartProvider = ({ children }) => {
   const checkout = async (formData) => {
     try {
       setLoading(true);
-
-      const cartId = cart?.id;
-      if (!cartId) {
-        throw new Error('No active cart');
-      }
-
-      const response = await axios.post(`/carts/${cartId}/checkout/`, formData);
-
+      const response = await axios.post('/orders/checkout', formData);
       // Clear cart after successful checkout
       setCart({ items: [], subtotal: 0, items_count: 0 });
       setError(null);
-      return { success: true, order: response.data.order };
+      return { success: true, order: response.data };
     } catch (err) {
       console.error('Error during checkout:', err);
-      const errorMsg = err.response?.data?.message || 'Có lỗi xảy ra khi thanh toán';
-      setError(errorMsg);
-      return { success: false, error: errorMsg };
+      setError(err.response?.data?.error || 'Có lỗi xảy ra khi thanh toán');
+      return { success: false, error: err.response?.data?.error || 'Có lỗi xảy ra khi thanh toán' };
     } finally {
       setLoading(false);
     }
@@ -224,12 +141,12 @@ export const CartProvider = ({ children }) => {
 
   // Load cart on mount
   useEffect(() => {
-    // Only fetch cart if user is logged in
+    // Chỉ fetch cart nếu user đã đăng nhập
     const token = localStorage.getItem('token');
     if (token) {
       fetchCart();
     } else {
-      // If not logged in, set empty cart
+      // Nếu chưa đăng nhập, set empty cart
       setCart({ items: [], subtotal: 0, items_count: 0 });
       setLoading(false);
     }

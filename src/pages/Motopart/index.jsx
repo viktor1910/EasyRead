@@ -56,13 +56,6 @@ const MotopartDetail = () => {
   const handleAddToCart = async () => {
     if (!motopart || quantity <= 0) return;
 
-    // Check if user is logged in
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-
     setLoading(true);
     const result = await addToCart(motopart.id, quantity);
     setLoading(false);
@@ -84,13 +77,6 @@ const MotopartDetail = () => {
 
   const handleBuyNow = async () => {
     if (!motopart || quantity <= 0) return;
-
-    // Check if user is logged in
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login');
-      return;
-    }
 
     setLoading(true);
     try {
@@ -178,11 +164,9 @@ const MotopartDetail = () => {
     );
   }
 
-  const price = Number(motopart.price) || 0;
-  const discount = Number(motopart.discount) || 0;
-  const finalPrice = discount > 0
-    ? price - (price * discount) / 100
-    : price;
+  const finalPrice = motopart.discount
+    ? motopart.price - (motopart.price * motopart.discount) / 100
+    : motopart.price;
 
   return (
     <Box
@@ -247,20 +231,20 @@ const MotopartDetail = () => {
         </Box>
 
         <Box mb={1} display="flex" alignItems="center" gap={2}>
-          {discount > 0 && (
+          {motopart.discount && (
             <Typography
               fontSize={20}
               color="text.secondary"
               sx={{ textDecoration: "line-through" }}
             >
-              {price.toLocaleString("vi-VN")}đ
+              {motopart.price.toLocaleString("vi-VN")}đ
             </Typography>
           )}
           <Typography fontSize={28} fontWeight={600} color="#d0011b">
             {finalPrice.toLocaleString("vi-VN")}đ
           </Typography>
-          {discount > 0 && (
-            <Chip label={`-${discount}%`} color="error" size="small" />
+          {motopart.discount && (
+            <Chip label={`-${motopart.discount}%`} color="error" size="small" />
           )}
         </Box>
 

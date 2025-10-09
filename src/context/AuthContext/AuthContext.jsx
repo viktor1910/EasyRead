@@ -58,45 +58,18 @@ export const AuthProvider = ({ children }) => {
         };
       }
     } catch (error) {
-      console.error("Login error:", error);
-
-      // Handle different error types
-      let errorMessage = "Đăng nhập thất bại";
-
-      if (error.response) {
-        // Server responded with error
-        const { status, data } = error.response;
-
-        if (status === 401) {
-          errorMessage = data.error || data.message || "Email hoặc mật khẩu không đúng";
-        } else if (status === 400) {
-          errorMessage = data.error || data.message || "Thông tin đăng nhập không hợp lệ";
-        } else if (status === 404) {
-          errorMessage = "Không tìm thấy tài khoản";
-        } else if (status >= 500) {
-          errorMessage = "Lỗi server, vui lòng thử lại sau";
-        } else {
-          errorMessage = data.error || data.message || error.message;
-        }
-      } else if (error.request) {
-        // Request made but no response
-        errorMessage = "Không thể kết nối đến server";
-      } else {
-        // Something else happened
-        errorMessage = error.message || "Có lỗi xảy ra";
-      }
-
-      return { success: false, error: errorMessage };
+      return { success: false, error: error.message };
     }
   };
 
   const register = async (username, email, password, firstName, lastName) => {
     try {
       const response = await authAPI.register({
-        name: `${firstName} ${lastName}`,
+        username,
         email,
         password,
-        password_confirmation: password,
+        first_name: firstName,
+        last_name: lastName,
         role: "user",
       });
 
@@ -126,15 +99,7 @@ export const AuthProvider = ({ children }) => {
         };
       }
     } catch (error) {
-      // Handle API error response
-      if (error.response?.data?.errors) {
-        return {
-          success: false,
-          error: error.response.data.message || "Đăng ký thất bại",
-          errors: error.response.data.errors
-        };
-      }
-      return { success: false, error: error.response?.data?.message || error.message };
+      return { success: false, error: error.message };
     }
   };
 
