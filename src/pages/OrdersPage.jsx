@@ -49,10 +49,13 @@ const OrdersPage = () => {
     try {
       setLoading(true);
       const response = await axios.get("/orders/");
-      setOrders(response.data);
+      // Backend trả về pagination response với results array
+      const ordersList = response.data.results || response.data;
+      setOrders(Array.isArray(ordersList) ? ordersList : []);
     } catch (err) {
       setError("Không thể tải danh sách đơn hàng");
       console.error("Error fetching orders:", err);
+      setOrders([]);
     } finally {
       setLoading(false);
     }

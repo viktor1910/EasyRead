@@ -60,7 +60,7 @@ const MotopartManagement = () => {
     refetch,
   } = useMotoparts({
     page: page + 1,
-    page_size: rowsPerPage,
+    limit: rowsPerPage,
     search: debouncedSearchKeyword || undefined,
   });
 

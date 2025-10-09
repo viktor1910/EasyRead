@@ -29,49 +29,25 @@ const getCategoryById = async (id: number): Promise<Category> => {
 };
 
 const createCategory = async (categoryData: CreateCategoryRequest): Promise<Category> => {
-  const formData = new FormData();
-
-  // Add all fields to FormData
-  Object.entries(categoryData).forEach(([key, value]) => {
-    if (value !== null && value !== undefined) {
-      // Handle file separately
-      if (key === 'image' && value instanceof File) {
-        formData.append(key, value);
-      } else if (typeof value !== 'object') {
-        formData.append(key, String(value));
-      }
-    }
-  });
-
-  const response = await AxiosConfig.post('/categories/', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+  const requestData = {
+    name: categoryData.name,
+    slug: categoryData.slug,
+    image: categoryData.image || null // Match Django field name
+  };
+  
+  const response = await AxiosConfig.post('/categories/', requestData);
   return response.data;
 };
 
 const updateCategory = async (categoryData: UpdateCategoryRequest): Promise<Category> => {
   const { id, ...updateData } = categoryData;
-  const formData = new FormData();
-
-  // Add all fields to FormData
-  Object.entries(updateData).forEach(([key, value]) => {
-    if (value !== null && value !== undefined) {
-      // Handle file separately
-      if (key === 'image' && value instanceof File) {
-        formData.append(key, value);
-      } else if (typeof value !== 'object') {
-        formData.append(key, String(value));
-      }
-    }
-  });
-
-  const response = await AxiosConfig.put(`/categories/${id}/`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+  const requestData = {
+    name: updateData.name,
+    slug: updateData.slug,
+    image: updateData.image || null // Match Django field name
+  };
+  
+  const response = await AxiosConfig.put(`/categories/${id}/`, requestData);
   return response.data;
 };
 

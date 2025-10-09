@@ -424,7 +424,7 @@ const ShippingManagement = () => {
                     <Table size="small">
                       <TableHead>
                         <TableRow>
-                          <TableCell>Sách</TableCell>
+                          <TableCell>Phụ tùng</TableCell>
                           <TableCell align="center">Số lượng</TableCell>
                           <TableCell align="right">Đơn giá</TableCell>
                           <TableCell align="right">Thành tiền</TableCell>
@@ -433,7 +433,7 @@ const ShippingManagement = () => {
                       <TableBody>
                         {selectedOrder.items.map((item) => (
                           <TableRow key={item.id}>
-                            <TableCell>{item.book?.title || "N/A"}</TableCell>
+                            <TableCell>{item.motopart?.name || "N/A"}</TableCell>
                             <TableCell align="center">
                               {item.quantity}
                             </TableCell>

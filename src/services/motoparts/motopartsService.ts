@@ -29,23 +29,9 @@ const getMotopartById = async (id: number): Promise<Motopart> => {
 };
 
 const createMotopart = async (motopartData: CreateMotopartRequest): Promise<Motopart> => {
-  const formData = new FormData();
-
-  // Add all fields to FormData
-  Object.entries(motopartData).forEach(([key, value]) => {
-    if (value !== null && value !== undefined) {
-      // Handle file separately
-      if (key === 'image' && value instanceof File) {
-        formData.append(key, value);
-      } else if (typeof value !== 'object') {
-        formData.append(key, String(value));
-      }
-    }
-  });
-
-  const response = await AxiosConfig.post('/motoparts/', formData, {
+  const response = await AxiosConfig.post('/motoparts/', motopartData, {
     headers: {
-      'Content-Type': 'multipart/form-data',
+      'Content-Type': 'application/json',
     },
   });
   return response.data;
@@ -53,23 +39,9 @@ const createMotopart = async (motopartData: CreateMotopartRequest): Promise<Moto
 
 const updateMotopart = async (motopartData: UpdateMotopartRequest): Promise<Motopart> => {
   const { id, ...updateData } = motopartData;
-  const formData = new FormData();
-
-  // Add all fields to FormData
-  Object.entries(updateData).forEach(([key, value]) => {
-    if (value !== null && value !== undefined) {
-      // Handle file separately
-      if (key === 'image' && value instanceof File) {
-        formData.append(key, value);
-      } else if (typeof value !== 'object') {
-        formData.append(key, String(value));
-      }
-    }
-  });
-
-  const response = await AxiosConfig.put(`/motoparts/${id}/`, formData, {
+  const response = await AxiosConfig.put(`/motoparts/${id}/`, updateData, {
     headers: {
-      'Content-Type': 'multipart/form-data',
+      'Content-Type': 'application/json',
     },
   });
   return response.data;

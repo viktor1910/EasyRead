@@ -64,17 +64,19 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (username, email, password, firstName, lastName) => {
     try {
+      // Combine firstName and lastName into name field for backend
+      const fullName = `${firstName} ${lastName}`.trim();
+
       const response = await authAPI.register({
-        username,
+        name: fullName,
         email,
         password,
-        first_name: firstName,
-        last_name: lastName,
+        password_confirmation: password,
         role: "user",
       });
 
-      // Backend trả về { message, user, token }
-      if (response.user && response.token) {
+      // Backend trả về { message, user }
+      if (response.user) {
         const userData = {
           id: response.user.id,
           username: response.user.username,
@@ -85,10 +87,8 @@ export const AuthProvider = ({ children }) => {
         };
 
         setUser(userData);
-        setToken(response.token);
 
-        // Lưu vào localStorage
-        localStorage.setItem("token", response.token);
+        // Lưu vào localStorage (không có token khi register)
         localStorage.setItem("user", JSON.stringify(userData));
 
         return { success: true, user: userData };
@@ -96,10 +96,19 @@ export const AuthProvider = ({ children }) => {
         return {
           success: false,
           error: response.message || "Đăng ký thất bại",
+          errors: response.errors,
         };
       }
     } catch (error) {
-      return { success: false, error: error.message };
+      // Handle both axios error and regular error
+      if (error.response && error.response.data) {
+        return {
+          success: false,
+          error: error.response.data.message || "Đăng ký thất bại",
+          errors: error.response.data.errors,
+        };
+      }
+      return { success: false, error: error.message || "Đã có lỗi xảy ra" };
     }
   };
 

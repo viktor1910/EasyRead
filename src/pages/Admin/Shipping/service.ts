@@ -29,28 +29,33 @@ export interface Order {
 export interface OrderItem {
   id?: number;
   order_id: number;
-  book_id: number;
+  motopart_id: number;
   quantity: number;
   price: string; // API trả về string, không phải number
+  unit_price: string;
+  total: string;
   created_at?: string;
   updated_at?: string;
-  book?: {
+  motopart?: {
     id: number;
-    title: string;
+    name: string;
     slug: string;
     price: number;
     discount: number | null;
     stock: number;
-    status: 'available' | 'out_of_stock';
+    status: string;
     description: string;
     image_url: string;
+    image_full_url?: string;
     category_id: number | null;
-    author_id: number;
-    published_year: number;
-    publisher: string;
+    category?: {
+      id: number;
+      name: string;
+    };
+    manufacture_year: number;
+    supplier: string;
     created_at: string;
     updated_at: string;
-    image_full_url: string;
   };
 }
 
@@ -94,24 +99,43 @@ export interface OrdersResponse {
 // API function để get all orders với pagination và filter
 const getAllOrders = async (params: OrdersQueryParams = {}): Promise<OrdersResponse> => {
   const queryParams = new URLSearchParams();
-  
+
   // Handle basic parameters
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
       if (key === 'status' && Array.isArray(value)) {
-        // Convert status array to comma-separated string
+        // Convert status array to comma-separated string for Django filter
         if (value.length > 0) {
-          queryParams.append('status', value.join(','));
+          value.forEach(status => queryParams.append('status', status));
         }
+      } else if (key === 'limit') {
+        // Django pagination uses page_size instead of limit
+        queryParams.append('page_size', String(value));
       } else if (!Array.isArray(value)) {
         queryParams.append(key, String(value));
       }
     }
   });
-  
+
   const queryString = queryParams.toString();
-  const response = await AxiosConfig.get(`/orders/admin/listall${queryString ? `?${queryString}` : ''}`);
-  return response.data;
+  const response = await AxiosConfig.get(`/orders/admin/${queryString ? `?${queryString}` : ''}`);
+
+  // Convert Django pagination format to match expected format
+  return {
+    current_page: params.page || 1,
+    data: response.data.results || [],
+    first_page_url: '',
+    from: 1,
+    last_page: Math.ceil((response.data.count || 0) / (params.limit || 10)),
+    last_page_url: '',
+    links: [],
+    next_page_url: null,
+    path: '/orders/',
+    per_page: params.limit || 10,
+    prev_page_url: null,
+    to: response.data.results?.length || 0,
+    total: response.data.count || 0,
+  };
 };
 
 // API function để get order by id
@@ -122,8 +146,8 @@ const getOrderById = async (id: number): Promise<Order> => {
 
 // API function để update order status
 const updateOrderStatus = async (id: number, status: Order['status']): Promise<Order> => {
-  const response = await AxiosConfig.put(`/orders/${id}/update`, { status });
-  return response.data;
+  const response = await AxiosConfig.put(`/orders/${id}/status/`, { status });
+  return response.data.order || response.data;
 };
 
 // React Query hook để get all orders với pagination

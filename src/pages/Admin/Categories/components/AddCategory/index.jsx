@@ -21,7 +21,6 @@ const AddCategoryModal = ({
   mode = "add",
 }) => {
   const [imagePreview, setImagePreview] = useState(null);
-  const [imageFile, setImageFile] = useState(null);
 
   const {
     control,
@@ -43,6 +42,7 @@ const AddCategoryModal = ({
   const updateCategoryMutation = useUpdateCategory();
 
   const watchName = watch("name");
+  const watchImage = watch("image");
 
   // Auto-generate slug from name
   useEffect(() => {
@@ -60,18 +60,28 @@ const AddCategoryModal = ({
     }
   }, [watchName, setValue]);
 
+  // Update image preview when URL changes
+  useEffect(() => {
+    const img = watchImage || "";
+    if (img && img.trim()) {
+      setImagePreview(img);
+    } else {
+      setImagePreview(null);
+    }
+  }, [watchImage]);
+
   // Set initial data when modal opens
   useEffect(() => {
     if (open) {
-      setImageFile(null);
       if (initialData && mode === "edit") {
         reset({
           name: initialData.name || "",
           slug: initialData.slug || "",
-          image: "",
+          // Prefer `image` but fall back to legacy `image_url` value
+          image: initialData.image || initialData.image_url || "",
         });
-        // Set image preview if editing and has existing image
-        const imgPreview = initialData.image_full_url || initialData.image;
+        // Set image preview if editing and has existing image URL
+        const imgPreview = initialData.image || initialData.image_url;
         if (imgPreview && typeof imgPreview === "string") {
           setImagePreview(imgPreview);
         }
@@ -86,36 +96,20 @@ const AddCategoryModal = ({
     }
   }, [initialData, mode, open, reset]);
 
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onload = (e) => setImagePreview(e.target.result);
-      reader.readAsDataURL(file);
-    }
-  };
-
   const onSubmitForm = async (data) => {
     if (mode === "add") {
       // Sử dụng react-query mutation để create category
       try {
-        const formData = {
+        await createCategoryMutation.mutateAsync({
           name: data.name,
           slug: data.slug,
-        };
-
-        // Only add image if file is selected
-        if (imageFile) {
-          formData.image = imageFile;
-        }
-
-        await createCategoryMutation.mutateAsync(formData);
+          // send to backend `image` field; keep empty string if missing
+          image: data.image || data.image_url || "",
+        });
 
         // Reset form và đóng modal sau khi thành công
         reset();
         setImagePreview(null);
-        setImageFile(null);
         onClose();
       } catch (error) {
         console.error("Error creating category:", error);
@@ -124,23 +118,16 @@ const AddCategoryModal = ({
     } else {
       // Sử dụng react-query mutation để update category
       try {
-        const formData = {
+        await updateCategoryMutation.mutateAsync({
           id: initialData?.id,
           name: data.name,
           slug: data.slug,
-        };
-
-        // Only add image if file is selected
-        if (imageFile) {
-          formData.image = imageFile;
-        }
-
-        await updateCategoryMutation.mutateAsync(formData);
+          image: data.image || data.image_url || "",
+        });
 
         // Reset form và đóng modal sau khi thành công
         reset();
         setImagePreview(null);
-        setImageFile(null);
         onClose();
       } catch (error) {
         console.error("Error updating category:", error);
@@ -214,26 +201,32 @@ const AddCategoryModal = ({
             )}
           />
 
-          {/* Image Upload */}
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle1" gutterBottom>
-              Hình ảnh danh mục
-            </Typography>
-            <Button
-              variant="outlined"
-              component="label"
-              fullWidth
-              sx={{ mb: 2 }}
-            >
-              Tải ảnh lên
-              <input
-                type="file"
-                hidden
-                accept="image/*"
-                onChange={handleImageChange}
+          {/* Image URL Input */}
+          <Controller
+            name="image"
+            control={control}
+            rules={{
+              pattern: {
+                value: /^(https?:\/\/).*\.(jpg|jpeg|png|gif|webp)$/i,
+                message:
+                  "Vui lòng nhập URL hình ảnh hợp lệ (jpg, jpeg, png, gif, webp)",
+              },
+            }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="URL hình ảnh danh mục"
+                type="url"
+                fullWidth
+                placeholder="https://example.com/image.jpg"
+                error={!!errors.image}
+                helperText={
+                  errors.image?.message ||
+                  "Nhập đường dẫn URL đến hình ảnh danh mục"
+                }
               />
-            </Button>
-          </Box>
+            )}
+          />
 
           {/* Image Preview */}
           {imagePreview && (

@@ -62,7 +62,7 @@ const MotopartItem = ({ motopart }) => {
         mb={1}
       >
         <img
-          src={motopart.image_full_url || motopart.image_url || "/placeholder-motopart.jpg"}
+          src={motopart.image_url || "/placeholder-motopart.jpg"}
           alt={motopart.name}
           style={{
             width: "100%",
